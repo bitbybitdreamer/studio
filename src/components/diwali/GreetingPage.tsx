@@ -123,7 +123,7 @@ export default function GreetingPage({ wish }: { wish: string }) {
 
     setIsGenerating(true);
     try {
-      const result = await generateWish({ occasion: 'a happy occasion' });
+      const result = await generateWish({ occasion: 'Diwali' });
       if (result.wish) {
         setCurrentWish(result.wish);
         setGeneratedImage(null); // Clear generated image when wish changes
@@ -172,13 +172,11 @@ export default function GreetingPage({ wish }: { wish: string }) {
     setIsGeneratingImage(true);
     try {
         const result = await generateImageFromWish({ wish: currentWish });
-        if (result.imageDataUri) {
-            setGeneratedImage(result.imageDataUri);
-            toast({
-                title: "Image Generated!",
-                description: "A beautiful image for your wish has been created.",
-            });
-        }
+        setGeneratedImage(result.imageDataUri);
+        toast({
+            title: "Image Generated!",
+            description: "A beautiful image for your wish has been created.",
+        });
     } catch (error) {
         console.error("Failed to generate image:", error);
         toast({
