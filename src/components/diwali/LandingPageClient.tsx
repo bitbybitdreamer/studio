@@ -4,9 +4,8 @@ import React, { useState, useEffect, useRef, CSSProperties, MouseEvent } from "r
 import { useRouter } from 'next/navigation';
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import FireworksBackground from "./FireworksBackground";
-import { generateWish } from "@/ai/flows/generate-wish";
 
 type Blast = {
   id: number;
@@ -51,24 +50,12 @@ export default function LandingPageClient() {
   const [isMobile, setIsMobile] = useState(false);
   const [parallaxStyle, setParallaxStyle] = useState<CSSProperties>({});
   const [blasts, setBlasts] = useState<Blast[]>([]);
-  const [wish, setWish] = useState("Wishing you a Diwali that shines as brightly as your spirit, bringing peace and happiness! 🪔");
-  const [isLoading, setIsLoading] = useState(true);
-
+  const wish = "Wishing you a Diwali that shines as brightly as your spirit, bringing peace and happiness! 🪔";
+  
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setIsMobile(window.innerWidth < 768);
     }
-    
-    // Generate initial wish on the client-side to avoid blocking server render
-    generateWish({ occasion: 'Diwali' })
-      .then(result => {
-        if (result.wish) {
-          setWish(result.wish);
-        }
-      })
-      .catch(err => console.error("Initial wish generation failed:", err))
-      .finally(() => setIsLoading(false));
-
   }, []);
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
@@ -126,7 +113,7 @@ export default function LandingPageClient() {
               Happy Diwali ✨
             </h1>
             <div className="font-body text-lg md:text-xl leading-relaxed text-foreground max-w-2xl animate-fade-in-up min-h-[56px] flex items-center justify-center">
-             {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <p>{wish}</p>}
+             <p>{wish}</p>
             </div>
             <Button
               size="lg"
