@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster"
 export const metadata: Metadata = {
   title: 'Sparkle Greetings',
   description: 'A dynamic 3D Diwali greetings page.',
+  icons: null,
 };
 
 export default function RootLayout({
