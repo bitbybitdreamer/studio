@@ -19,27 +19,25 @@ export default async function LandingPage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 overflow-hidden relative text-center">
+    <LandingPageClient>
       <FireworksBackground />
-      <LandingPageClient>
-        <div className="z-10 flex flex-col items-center gap-6">
-          <h1 className="font-headline text-6xl md:text-8xl text-primary tracking-wider animate-fade-in-down">
-            Happy Diwali
-          </h1>
-          <p className="font-body text-lg md:text-xl leading-relaxed text-foreground max-w-2xl animate-fade-in-up">
-            {wish}
-          </p>
-          <Link href="/greeting" passHref>
-            <Button
-              size="lg"
-              className="mt-6 bg-accent text-accent-foreground hover:bg-accent/90 animate-pulse"
-            >
-              Time for a Surprise!
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </Link>
-        </div>
-      </LandingPageClient>
-    </main>
+      <div className="z-10 flex flex-col items-center gap-6 text-center">
+        <h1 className="font-headline text-6xl md:text-8xl text-primary tracking-wider animate-fade-in-down">
+          Happy Diwali
+        </h1>
+        <p className="font-body text-lg md:text-xl leading-relaxed text-foreground max-w-2xl animate-fade-in-up">
+          {wish}
+        </p>
+        <Link href="/greeting" passHref>
+          <Button
+            size="lg"
+            className="mt-6 bg-accent text-accent-foreground hover:bg-accent/90 animate-pulse"
+          >
+            Time for a Surprise!
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
+        </Link>
+      </div>
+    </LandingPageClient>
   );
 }

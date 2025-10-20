@@ -1,12 +1,53 @@
 
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useState, useEffect, useRef, CSSProperties, MouseEvent } from "react";
 
 export default function LandingPageClient({ children }: { children: ReactNode }) {
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [parallaxStyle, setParallaxStyle] = useState<CSSProperties>({});
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+  }, []);
+
+  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+    if (isMobile || !contentRef.current) return;
+
+    const { clientX, clientY, currentTarget } = e;
+    const { offsetWidth, offsetHeight } = currentTarget;
+
+    const xPos = (clientX / offsetWidth - 0.5) * 2;
+    const yPos = (clientY / offsetHeight - 0.5) * 2;
+
+    const rotateY = xPos * 10; // Reduced rotation for a subtler effect
+    const rotateX = yPos * -10;
+
+    setParallaxStyle({
+      transform: `perspective(1500px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`,
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setParallaxStyle({
+      transform: 'perspective(1500px) rotateX(0deg) rotateY(0deg) scale(1)',
+    });
+  };
+
   return (
-    <>
-      {children}
+    <main
+      className="flex min-h-screen flex-col items-center justify-center p-4 overflow-hidden relative"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+        <div
+          ref={contentRef}
+          style={parallaxStyle}
+          className="transition-transform duration-300 ease-out"
+        >
+            {children}
+        </div>
       <style jsx>{`
         @keyframes fade-in-down {
           from {
@@ -47,6 +88,6 @@ export default function LandingPageClient({ children }: { children: ReactNode })
             }
         }
       `}</style>
-    </>
+    </main>
   );
 }
