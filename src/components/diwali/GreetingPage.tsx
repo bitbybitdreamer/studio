@@ -129,27 +129,22 @@ export default function GreetingPage({ wish }: { wish: string }) {
     setBlasts(prev => prev.filter(b => b.id !== id));
   };
 
-  const handleShare = async () => {
-    const shareData = {
-      title: 'A Special Wish For You!',
-      text: `Sharing a special wish with you:`,
-      url: window.location.href,
-    };
-    if (navigator.share) {
-      try {
-        await navigator.share(shareData);
-      } catch (err) {
-        console.error("Error sharing:", err);
-      }
-    } else {
-        navigator.clipboard.writeText(window.location.href);
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href).then(() => {
         setIsCopied(true);
         toast({
             title: "Link Copied!",
             description: "You can now share the link with your friends and family.",
         });
         setTimeout(() => setIsCopied(false), 2000);
-    }
+    }).catch(err => {
+        console.error("Failed to copy:", err);
+        toast({
+            variant: "destructive",
+            title: "Copy Failed",
+            description: "Could not copy the link to your clipboard.",
+        });
+    });
   };
 
 
