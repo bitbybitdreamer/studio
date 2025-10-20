@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, CSSProperties, MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PartyPopper, Share2, Copy, Loader2, ArrowLeft } from "lucide-react";
+import { PartyPopper, Copy, Loader2, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import FireworksBackground from "./FireworksBackground";
 import { cn } from "@/lib/utils";
@@ -132,12 +132,12 @@ export default function GreetingPage({ wish }: { wish: string }) {
     setBlasts(prev => prev.filter(b => b.id !== id));
   };
 
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href).then(() => {
+  const handleCopyWish = () => {
+    navigator.clipboard.writeText(currentWish).then(() => {
         setIsCopied(true);
         toast({
-            title: "Link Copied!",
-            description: "You can now share the link with your friends and family.",
+            title: "Wish Copied!",
+            description: "The wish has been copied to your clipboard.",
         });
         setTimeout(() => setIsCopied(false), 2000);
     }).catch(err => {
@@ -145,7 +145,7 @@ export default function GreetingPage({ wish }: { wish: string }) {
         toast({
             variant: "destructive",
             title: "Copy Failed",
-            description: "Could not copy the link to your clipboard.",
+            description: "Could not copy the wish to your clipboard.",
         });
     });
   };
@@ -208,16 +208,9 @@ export default function GreetingPage({ wish }: { wish: string }) {
                     )}
                     Tap for a Surprise!
                 </Button>
-                <Button onClick={handleShare} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all">
-                    {isCopied ? (
-                        <>
-                            <Copy className="mr-2 h-4 w-4" /> Copied!
-                        </>
-                    ) : (
-                        <>
-                            <Share2 className="mr-2 h-4 w-4" /> Share
-                        </>
-                    )}
+                <Button onClick={handleCopyWish} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all">
+                    <Copy className="mr-2 h-4 w-4" />
+                    {isCopied ? "Copied!" : "Copy Wish"}
                 </Button>
             </div>
             </CardContent>
