@@ -4,8 +4,9 @@ import React, { useState, useEffect, useRef, CSSProperties, MouseEvent } from "r
 import { useRouter } from 'next/navigation';
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import FireworksBackground from "./FireworksBackground";
+import { generateWish } from "@/ai/flows/generate-wish";
 
 type Blast = {
   id: number;
@@ -44,18 +45,37 @@ const BlastParticle = ({ onComplete }: { onComplete: () => void }) => {
   );
 };
 
-export default function LandingPageClient({ initialWish }: { initialWish: string }) {
+export default function LandingPageClient() {
   const router = useRouter();
   const contentRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [parallaxStyle, setParallaxStyle] = useState<CSSProperties>({});
   const [isExiting, setIsExiting] = useState(false);
   const [blasts, setBlasts] = useState<Blast[]>([]);
+  const [wish, setWish] = useState("Wishing you a Diwali that shines as brightly as your spirit, bringing peace and happiness! 🪔");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setIsMobile(window.innerWidth < 768);
     }
+    
+    const fetchWish = async () => {
+      try {
+        const result = await generateWish({ occasion: 'Diwali' });
+        if (result.wish) {
+          setWish(result.wish);
+        }
+      } catch (error) {
+        console.error("Failed to generate wish for landing page:", error);
+        // A fallback wish is already set
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchWish();
+
   }, []);
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
@@ -121,9 +141,9 @@ export default function LandingPageClient({ initialWish }: { initialWish: string
             <h1 className="font-headline text-6xl md:text-8xl text-primary tracking-wider animate-fade-in-down">
               Happy Diwali ✨
             </h1>
-            <p className="font-body text-lg md:text-xl leading-relaxed text-foreground max-w-2xl animate-fade-in-up">
-              {initialWish}
-            </p>
+            <div className="font-body text-lg md:text-xl leading-relaxed text-foreground max-w-2xl animate-fade-in-up min-h-[56px] flex items-center justify-center">
+             {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <p>{wish}</p>}
+            </div>
             <Button
               size="lg"
               className="mt-6 bg-accent text-accent-foreground hover:bg-accent/90 animate-pulse"

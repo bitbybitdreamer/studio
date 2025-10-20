@@ -1,17 +1,14 @@
-
 "use client";
 
 import { useState, useEffect, useRef, CSSProperties, MouseEvent } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PartyPopper, Copy, Loader2, ArrowLeft, Wand2 } from "lucide-react";
+import { PartyPopper, Copy, Loader2, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import FireworksBackground from "./FireworksBackground";
 import { cn } from "@/lib/utils";
 import { generateWish } from "@/ai/flows/generate-wish";
-import { generateImageFromWish } from "@/ai/flows/generate-image-from-wish";
 
 
 type Blast = {
@@ -52,7 +49,7 @@ const BlastParticle = ({ onComplete }: { onComplete: () => void }) => {
 };
 
 
-export default function GreetingPage({ wish }: { wish: string }) {
+export default function GreetingPage({ wish: initialWish }: { wish: string }) {
   const { toast } = useToast();
   const cardRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -64,11 +61,8 @@ export default function GreetingPage({ wish }: { wish: string }) {
   const [backgroundParallaxStyle, setBackgroundParallaxStyle] = useState<CSSProperties>({});
   
   const [blasts, setBlasts] = useState<Blast[]>([]);
-  const [currentWish, setCurrentWish] = useState(wish);
+  const [currentWish, setCurrentWish] = useState(initialWish);
   const [isGenerating, setIsGenerating] = useState(false);
-  
-  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
-  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
 
   useEffect(() => {
@@ -126,14 +120,15 @@ export default function GreetingPage({ wish }: { wish: string }) {
       const result = await generateWish({ occasion: 'Diwali' });
       if (result.wish) {
         setCurrentWish(result.wish);
-        setGeneratedImage(null); // Clear generated image when wish changes
+      } else {
+        throw new Error("AI did not return a wish.");
       }
     } catch (error) {
       console.error("Failed to generate new wish:", error);
       toast({
         variant: "destructive",
-        title: "Oh no!",
-        description: "Could not generate a new wish. Please try again.",
+        title: "Oh no! Wish generation failed.",
+        description: "The AI couldn't create a new wish for you. Please try again.",
       });
     } finally {
       setIsGenerating(false);
@@ -168,27 +163,6 @@ export default function GreetingPage({ wish }: { wish: string }) {
     }, 500);
   };
   
-  const handleGenerateImage = async () => {
-    setIsGeneratingImage(true);
-    try {
-        const result = await generateImageFromWish({ wish: currentWish });
-        setGeneratedImage(result.imageDataUri);
-        toast({
-            title: "Image Generated!",
-            description: "A beautiful image for your wish has been created.",
-        });
-    } catch (error) {
-        console.error("Failed to generate image:", error);
-        toast({
-            variant: "destructive",
-            title: "AI Image Generation Failed",
-            description: "The AI failed to create an image for your wish. Please try again.",
-        });
-    } finally {
-        setIsGeneratingImage(false);
-    }
-  };
-
 
   return (
     <main
@@ -225,20 +199,10 @@ export default function GreetingPage({ wish }: { wish: string }) {
                 </h1>
                 
                 <div className="relative w-full aspect-square rounded-lg overflow-hidden border border-primary/20 flex items-center justify-center bg-background/30">
-                    {isGeneratingImage ? (
-                        <div className="flex flex-col items-center gap-4 text-center">
-                            <Loader2 className="h-10 w-10 animate-spin text-primary"/>
-                            <p className="text-sm text-muted-foreground">Generating your image...</p>
-                        </div>
-                    ) : generatedImage ? (
-                        <Image src={generatedImage} alt="Generated greeting image" layout="fill" objectFit="cover" />
-                    ) : (
-                        <p className="font-body text-lg leading-relaxed text-foreground min-h-[112px] flex items-center justify-center p-4">
-                            {currentWish}
-                        </p>
-                    )}
+                    <p className="font-body text-lg leading-relaxed text-foreground min-h-[112px] flex items-center justify-center p-4">
+                        {currentWish}
+                    </p>
                 </div>
-
 
                 <div className="flex flex-col sm:flex-row gap-4 w-full mt-4">
                     <Button
@@ -259,18 +223,6 @@ export default function GreetingPage({ wish }: { wish: string }) {
                         Copy Wish
                     </Button>
                 </div>
-                
-                <div className="w-full border-t border-border pt-6 flex flex-col gap-4">
-                  <Button onClick={handleGenerateImage} disabled={isGeneratingImage} className="w-full bg-amber-500 hover:bg-amber-600 text-black">
-                    {isGeneratingImage ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      <Wand2 className="mr-2 h-4 w-4" />
-                    )}
-                    Generate Image from Wish
-                  </Button>
-                </div>
-
             </CardContent>
         </Card>
       </div>
