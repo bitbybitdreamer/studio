@@ -1,9 +1,10 @@
 
 "use client";
 
-import { ReactNode, useState, useEffect, useRef, CSSProperties, MouseEvent } from "react";
+import React, { ReactNode, useState, useEffect, useRef, CSSProperties, MouseEvent } from "react";
 import { useRouter } from 'next/navigation';
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 type Blast = {
   id: number;
@@ -52,7 +53,6 @@ export default function LandingPageClient({ children }: { children: ReactNode })
   const [blasts, setBlasts] = useState<Blast[]>([]);
 
   useEffect(() => {
-    // This check ensures window is defined, preventing server-side errors.
     if (typeof window !== 'undefined') {
       setIsMobile(window.innerWidth < 768);
     }
@@ -81,11 +81,7 @@ export default function LandingPageClient({ children }: { children: ReactNode })
     });
   };
 
-  const handleSurpriseClick = (e: MouseEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLElement;
-    const button = target.closest('button');
-
-    if (button) {
+  const handleSurpriseClick = (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       
       const newBlast: Blast = {
@@ -100,7 +96,6 @@ export default function LandingPageClient({ children }: { children: ReactNode })
       setTimeout(() => {
           router.push('/greeting');
       }, 500); 
-    }
   };
 
   const removeBlast = (id: number) => {
@@ -118,17 +113,22 @@ export default function LandingPageClient({ children }: { children: ReactNode })
       onMouseLeave={handleMouseLeave}
     >
         <div
-          // This div captures the click event for the button inside children
-          onClick={handleSurpriseClick}
-          className="relative z-10"
+          ref={contentRef}
+          style={parallaxStyle}
+          className="transition-transform duration-500 ease-out relative z-10 flex flex-col items-center text-center"
         >
-          <div
-            ref={contentRef}
-            style={parallaxStyle}
-            className="transition-transform duration-500 ease-out"
-          >
-              {children}
-          </div>
+              {React.Children.map(children, child => {
+                if (React.isValidElement(child) && child.props.children) {
+                    const newChildren = React.Children.map(child.props.children, (grandchild: any) => {
+                         if (React.isValidElement(grandchild) && grandchild.type === Button) {
+                            return React.cloneElement(grandchild, { onClick: handleSurpriseClick });
+                         }
+                         return grandchild;
+                    });
+                    return React.cloneElement(child, {children: newChildren});
+                }
+                return child;
+              })}
         </div>
 
         {blasts.map((blast) => (

@@ -19,8 +19,7 @@ export default async function LandingPage() {
 
   return (
     <LandingPageClient>
-      <FireworksBackground />
-      <div className="z-10 flex flex-col items-center gap-6 text-center">
+        <FireworksBackground />
         <h1 className="font-headline text-6xl md:text-8xl text-primary tracking-wider animate-fade-in-down">
           Happy Diwali
         </h1>
@@ -34,7 +33,6 @@ export default async function LandingPage() {
           Time for a Surprise!
           <ArrowRight className="ml-2 h-5 w-5" />
         </Button>
-      </div>
     </LandingPageClient>
   );
 }
