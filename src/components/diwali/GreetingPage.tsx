@@ -3,10 +3,11 @@
 import { useState, useEffect, useRef, CSSProperties, MouseEvent } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PartyPopper, Share2, Copy } from "lucide-react";
+import { PartyPopper, Share2, Copy, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import FireworksBackground from "./FireworksBackground";
 import { cn } from "@/lib/utils";
+import { generateDiwaliWish } from "@/ai/flows/generate-diwali-wish";
 
 type Blast = {
   id: number;
@@ -57,6 +58,9 @@ export default function GreetingPage({ wish }: { wish: string }) {
   const [blasts, setBlasts] = useState<Blast[]>([]);
   const [isCopied, setIsCopied] = useState(false);
 
+  const [currentWish, setCurrentWish] = useState(wish);
+  const [isGenerating, setIsGenerating] = useState(false);
+
   useEffect(() => {
     setIsMobile(window.innerWidth < 768);
   }, []);
@@ -82,7 +86,7 @@ export default function GreetingPage({ wish }: { wish: string }) {
     });
   };
 
-  const handleBlastClick = (e: MouseEvent<HTMLButtonElement>) => {
+  const handleBlastClick = async (e: MouseEvent<HTMLButtonElement>) => {
     const newBlast: Blast = {
       id: Date.now(),
       x: e.clientX,
@@ -90,6 +94,23 @@ export default function GreetingPage({ wish }: { wish: string }) {
       color: COLORS[Math.floor(Math.random() * COLORS.length)],
     };
     setBlasts(prev => [...prev, newBlast]);
+
+    setIsGenerating(true);
+    try {
+      const result = await generateDiwaliWish({});
+      if (result.wish) {
+        setCurrentWish(result.wish);
+      }
+    } catch (error) {
+      console.error("Failed to generate new Diwali wish:", error);
+      toast({
+        variant: "destructive",
+        title: "Oh no!",
+        description: "Could not generate a new wish. Please try again.",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const removeBlast = (id: number) => {
@@ -146,16 +167,21 @@ export default function GreetingPage({ wish }: { wish: string }) {
             <h1 className="font-headline text-4xl text-primary tracking-wider">
                 Happy Diwali
             </h1>
-            <p className="font-body text-lg leading-relaxed text-foreground">
-                {wish}
+            <p className="font-body text-lg leading-relaxed text-foreground min-h-[112px]">
+                {currentWish}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 w-full mt-4">
                 <Button
                     variant="outline"
                     className="w-full border-accent text-accent hover:bg-accent hover:text-accent-foreground"
                     onClick={handleBlastClick}
+                    disabled={isGenerating}
                 >
-                    <PartyPopper className="mr-2 h-4 w-4" />
+                    {isGenerating ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                        <PartyPopper className="mr-2 h-4 w-4" />
+                    )}
                     Tap for a Surprise!
                 </Button>
                 <Button onClick={handleShare} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
