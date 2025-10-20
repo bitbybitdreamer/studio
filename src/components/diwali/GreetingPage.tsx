@@ -7,7 +7,7 @@ import { PartyPopper, Share2, Copy, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import FireworksBackground from "./FireworksBackground";
 import { cn } from "@/lib/utils";
-import { generateDiwaliWish } from "@/ai/flows/generate-diwali-wish";
+import { generateWish } from "@/ai/flows/generate-wish";
 
 type Blast = {
   id: number;
@@ -97,12 +97,12 @@ export default function GreetingPage({ wish }: { wish: string }) {
 
     setIsGenerating(true);
     try {
-      const result = await generateDiwaliWish({});
+      const result = await generateWish({});
       if (result.wish) {
         setCurrentWish(result.wish);
       }
     } catch (error) {
-      console.error("Failed to generate new Diwali wish:", error);
+      console.error("Failed to generate new wish:", error);
       toast({
         variant: "destructive",
         title: "Oh no!",
@@ -119,8 +119,8 @@ export default function GreetingPage({ wish }: { wish: string }) {
 
   const handleShare = async () => {
     const shareData = {
-      title: 'Happy Diwali!',
-      text: `Sharing a special Diwali greeting with you:`,
+      title: 'A Special Wish For You!',
+      text: `Sharing a special wish with you:`,
       url: window.location.href,
     };
     if (navigator.share) {
@@ -165,7 +165,7 @@ export default function GreetingPage({ wish }: { wish: string }) {
         >
             <CardContent className="p-8 text-center flex flex-col items-center gap-6">
             <h1 className="font-headline text-4xl text-primary tracking-wider">
-                Happy Diwali
+                A Wish For You
             </h1>
             <p className="font-body text-lg leading-relaxed text-foreground min-h-[112px]">
                 {currentWish}
@@ -201,7 +201,7 @@ export default function GreetingPage({ wish }: { wish: string }) {
       </div>
 
        <footer className="absolute bottom-4 text-center text-xs text-muted-foreground/50">
-            <p>Built with love for the Festival of Lights.</p>
+            <p>Built with love.</p>
             <p>Move your cursor for a 3D effect.</p>
         </footer>
     </main>
