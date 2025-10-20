@@ -117,7 +117,7 @@ export default function GreetingPage({ wish: initialWish }: { wish: string }) {
 
     setIsGenerating(true);
     try {
-      const result = await generateWish({ occasion: 'Diwali' });
+      const result = await generateWish({ occasion: 'a unique and surprising Diwali' });
       if (result.wish) {
         setCurrentWish(result.wish);
       } else {
@@ -195,7 +195,7 @@ export default function GreetingPage({ wish: initialWish }: { wish: string }) {
           </Button>
             <CardContent className="p-8 text-center flex flex-col items-center gap-6">
                 <h1 className="font-headline text-4xl text-primary tracking-wider mt-8">
-                    A Wish For You
+                    Your Surprise Wish! ✨
                 </h1>
                 
                 <div className="relative w-full aspect-square rounded-lg overflow-hidden border border-primary/20 flex items-center justify-center bg-background/30">
