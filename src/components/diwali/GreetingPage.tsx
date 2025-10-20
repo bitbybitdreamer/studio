@@ -61,44 +61,13 @@ export default function GreetingPage({ initialWish }: { initialWish: string }) {
   
   const [blasts, setBlasts] = useState<Blast[]>([]);
   const [currentWish, setCurrentWish] = useState(initialWish);
-  const [displayedWish, setDisplayedWish] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const animationIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setIsMobile(window.innerWidth < 768);
     }
   }, []);
-
-  useEffect(() => {
-    if (animationIntervalRef.current) {
-        clearInterval(animationIntervalRef.current);
-    }
-    setDisplayedWish("");
-    const words = currentWish.split(/(\s+)/);
-    let currentIndex = 0;
-
-    if (words.length > 0) {
-      animationIntervalRef.current = setInterval(() => {
-        if (currentIndex < words.length) {
-          setDisplayedWish(prev => prev + words[currentIndex]);
-          currentIndex++;
-        } else {
-          if (animationIntervalRef.current) {
-             clearInterval(animationIntervalRef.current);
-          }
-        }
-      }, 50); 
-    }
-    
-    return () => {
-        if (animationIntervalRef.current) {
-            clearInterval(animationIntervalRef.current);
-        }
-    };
-  }, [currentWish]);
-
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     if (isMobile || !cardRef.current) return;
@@ -215,7 +184,7 @@ export default function GreetingPage({ initialWish }: { initialWish: string }) {
                 </h1>
                 
                 <p className="font-body text-lg leading-relaxed text-foreground min-h-[112px] flex items-center justify-center p-4">
-                  {displayedWish}
+                  {currentWish}
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 w-full mt-4">
