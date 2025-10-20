@@ -35,6 +35,9 @@ const prompt = ai.definePrompt({
   prompt: `You are a wish generator. Generate a new, unique, heartwarming, friendly, and universally shareable wish for {{{occasion}}}. The wish should be a single, complete sentence that is positive, uplifting, and ends with a relevant emoji.`,
 });
 
+const EMOJI_REGEX = /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/;
+const FALLBACK_EMOJIS = ['✨', '💖', '🎉', '🪔', '⭐', '🎊'];
+
 const generateWishFlow = ai.defineFlow(
   {
     name: 'generateWishFlow',
@@ -44,6 +47,11 @@ const generateWishFlow = ai.defineFlow(
   async input => {
     const {output} = await prompt(input);
     if (output && output.wish) {
+        // Check if the wish already ends with an emoji.
+        if (!EMOJI_REGEX.test(output.wish.slice(-2))) {
+            const randomEmoji = FALLBACK_EMOJIS[Math.floor(Math.random() * FALLBACK_EMOJIS.length)];
+            output.wish = `${output.wish.replace(/[.,!?:;]*$/, '')} ${randomEmoji}`;
+        }
         return output;
     }
     throw new Error("AI wish generation failed to return a wish.");
