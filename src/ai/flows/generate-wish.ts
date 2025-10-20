@@ -56,7 +56,9 @@ const generateWishFlow = ai.defineFlow(
       if (output && output.wish) {
           // Check if the wish already ends with an emoji.
           if (!EMOJI_REGEX.test(output.wish)) {
-              const randomEmoji = FALLBACK_EMOJIS[Math.floor(Math.random() * FALLBACK_EMOJIS.length)];
+              // Ensure a new random emoji is picked every time.
+              const randomIndex = Math.floor(Math.random() * FALLBACK_EMOJIS.length);
+              const randomEmoji = FALLBACK_EMOJIS[randomIndex];
               // Append a random emoji if one is missing.
               output.wish = `${output.wish.replace(/[.,!?:; ]*$/, '')} ${randomEmoji}`;
           }
