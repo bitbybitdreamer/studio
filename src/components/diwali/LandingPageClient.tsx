@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { ReactNode, useState, useEffect, useRef, CSSProperties, MouseEvent } from "react";
+import React, { useState, useEffect, useRef, CSSProperties, MouseEvent } from "react";
 import { useRouter } from 'next/navigation';
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
