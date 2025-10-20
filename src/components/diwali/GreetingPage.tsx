@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef, CSSProperties, MouseEvent } from "react";
@@ -59,26 +60,15 @@ export default function GreetingPage({ initialWish }: { initialWish: string }) {
   const [backgroundParallaxStyle, setBackgroundParallaxStyle] = useState<CSSProperties>({});
   
   const [blasts, setBlasts] = useState<Blast[]>([]);
-  const [currentWish, setCurrentWish]_ = useState(initialWish);
+  const [currentWish, setCurrentWish] = useState(initialWish);
   const [displayedWish, setDisplayedWish] = useState("");
-  const [isGenerating, setIsGenerating] = useState(true);
+  const [isGenerating, setIsGenerating] = useState(false);
   const animationIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setIsMobile(window.innerWidth < 768);
     }
-    
-    // Generate initial wish on the client-side to avoid blocking server render
-    generateWish({ occasion: 'Diwali' })
-      .then(result => {
-        if (result.wish) {
-          setCurrentWish(result.wish);
-        }
-      })
-      .catch(err => console.error("Initial wish generation failed:", err))
-      .finally(() => setIsGenerating(false));
-
   }, []);
 
   useEffect(() => {
