@@ -17,6 +17,7 @@ const GenerateWishInputSchema = z.object({
     .string()
     .default('a happy occasion')
     .describe('The occasion for the wish, defaults to a happy occasion.'),
+  cacheBuster: z.string().optional().describe('A random string to prevent caching.'),
 });
 export type GenerateWishInput = z.infer<typeof GenerateWishInputSchema>;
 
@@ -33,10 +34,9 @@ const prompt = ai.definePrompt({
   name: 'generateWishPrompt',
   input: {schema: GenerateWishInputSchema},
   output: {schema: GenerateWishOutputSchema},
-  prompt: `You are a wish generator. Generate a new, unique, heartwarming, friendly, and universally shareable wish for {{{occasion}}}. The wish must be a single, complete sentence that is positive, uplifting, and must end with a relevant emoji.`,
+  prompt: `You are a wish generator. Generate a new, unique, heartwarming, friendly, and universally shareable wish for {{{occasion}}}. Use the following random seed to ensure uniqueness: {{{cacheBuster}}}. The wish must be a single, complete sentence that is positive, uplifting, and must end with a relevant emoji.`,
 });
 
-// A more robust regex to detect a wide range of emojis at the end of a string.
 const EMOJI_REGEX = /(\p{Emoji_Presentation}|\p{Extended_Pictographic})\s*$/u;
 const FALLBACK_EMOJIS = ['✨', '💖', '🎉', '🪔', '⭐', '🎊'];
 const FALLBACK_WISH = "Wishing you a Diwali that brings happiness, prosperity, and joy to you and your family. ✨";
@@ -52,24 +52,18 @@ const generateWishFlow = ai.defineFlow(
     try {
       const {output} = await prompt(input);
 
-      // If AI returns a valid wish, process it.
       if (output && output.wish) {
-          // Check if the wish already ends with an emoji.
           if (!EMOJI_REGEX.test(output.wish)) {
-              // Ensure a new random emoji is picked every time.
               const randomIndex = Math.floor(Math.random() * FALLBACK_EMOJIS.length);
               const randomEmoji = FALLBACK_EMOJIS[randomIndex];
-              // Append a random emoji if one is missing.
               output.wish = `${output.wish.replace(/[.,!?:; ]*$/, '')} ${randomEmoji}`;
           }
           return output;
       }
     } catch (error) {
-      // Log the error for debugging, but don't let it crash the app.
       console.error("AI wish generation failed, returning fallback:", error);
     }
     
-    // If the AI fails for any reason (error, empty output), return a safe fallback wish.
     return { wish: FALLBACK_WISH };
   }
 );

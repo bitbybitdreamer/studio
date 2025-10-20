@@ -114,7 +114,7 @@ export default function GreetingPage({ initialWish }: { initialWish: string }) {
 
     setIsGenerating(true);
     try {
-      const result = await generateWish({ occasion: 'Diwali' });
+      const result = await generateWish({ occasion: 'Diwali', cacheBuster: String(Date.now()) });
       if (result.wish) {
         setCurrentWish(result.wish);
       } else {
@@ -303,4 +303,3 @@ export default function GreetingPage({ initialWish }: { initialWish: string }) {
     </main>
   );
 }
-
