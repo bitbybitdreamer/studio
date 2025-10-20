@@ -8,7 +8,7 @@ function GreetingContent() {
   const searchParams = useSearchParams();
   const wish = searchParams.get('wish') || "May your days be filled with joy, laughter, and endless good fortune! ✨";
 
-  return <GreetingPage wish={wish} />;
+  return <GreetingPage initialWish={wish} />;
 }
 
 export default function Greeting() {

@@ -43,7 +43,7 @@ const personalizeImageFlow = ai.defineFlow(
             { text: `Write the following text on this image in an elegant, festive, and stylish font that complements the image. The text should be clearly visible and artistically integrated. Text: "${wish}"` },
         ],
         config: {
-            responseModalities: ['IMAGE', 'TEXT'],
+            responseModalities: ['IMAGE'],
         },
     });
 

@@ -1,14 +1,16 @@
 "use client";
 
-import { useState, useEffect, useRef, CSSProperties, MouseEvent } from "react";
+import { useState, useEffect, useRef, CSSProperties, MouseEvent, ChangeEvent } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PartyPopper, Copy, Loader2, ArrowLeft } from "lucide-react";
+import { PartyPopper, Copy, Loader2, ArrowLeft, Upload, Wand2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import FireworksBackground from "./FireworksBackground";
 import { cn } from "@/lib/utils";
 import { generateWish } from "@/ai/flows/generate-wish";
+import { personalizeImage, PersonalizeImageOutput } from "@/ai/flows/personalize-image-flow";
 
 
 type Blast = {
@@ -49,10 +51,11 @@ const BlastParticle = ({ onComplete }: { onComplete: () => void }) => {
 };
 
 
-export default function GreetingPage({ wish: initialWish }: { wish: string }) {
+export default function GreetingPage({ initialWish }: { initialWish: string }) {
   const { toast } = useToast();
   const cardRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isMobile, setIsMobile] = useState(false);
 
@@ -62,6 +65,10 @@ export default function GreetingPage({ wish: initialWish }: { wish: string }) {
   const [blasts, setBlasts] = useState<Blast[]>([]);
   const [currentWish, setCurrentWish] = useState(initialWish);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isPersonalizing, setIsPersonalizing] = useState(false);
+
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [personalizedImageResult, setPersonalizedImageResult] = useState<string | null>(null);
 
 
   useEffect(() => {
@@ -108,6 +115,7 @@ export default function GreetingPage({ wish: initialWish }: { wish: string }) {
       color: COLORS[Math.floor(Math.random() * COLORS.length)],
     };
     setBlasts(prev => [...prev, newBlast]);
+    setPersonalizedImageResult(null);
 
     setIsGenerating(true);
     try {
@@ -152,7 +160,47 @@ export default function GreetingPage({ wish: initialWish }: { wish: string }) {
   const handleBackClick = () => {
     router.push('/');
   };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUploadedImage(reader.result as string);
+        setPersonalizedImageResult(null);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
   
+  const handlePersonalize = async () => {
+    if (!uploadedImage) {
+      toast({
+        variant: "destructive",
+        title: "No Image",
+        description: "Please upload an image first.",
+      });
+      return;
+    }
+    setIsPersonalizing(true);
+    try {
+      const result: PersonalizeImageOutput = await personalizeImage({ photoDataUri: uploadedImage, wish: currentWish });
+      setPersonalizedImageResult(result.imageDataUri);
+    } catch (error) {
+      console.error("Failed to personalize image:", error);
+      toast({
+        variant: "destructive",
+        title: "Oh no! Personalization failed.",
+        description: "The AI couldn't add the wish to your image. Please try again.",
+      });
+    } finally {
+      setIsPersonalizing(false);
+    }
+  };
 
   return (
     <main
@@ -186,9 +234,15 @@ export default function GreetingPage({ wish: initialWish }: { wish: string }) {
                 </h1>
                 
                 <div className="relative w-full aspect-square rounded-lg overflow-hidden border border-primary/20 flex items-center justify-center bg-background/30">
+                  {personalizedImageResult ? (
+                     <Image src={personalizedImageResult} alt="Personalized wish" layout="fill" objectFit="contain" />
+                  ) : uploadedImage ? (
+                    <Image src={uploadedImage} alt="Uploaded photo" layout="fill" objectFit="contain" />
+                  ) : (
                     <p className="font-body text-lg leading-relaxed text-foreground min-h-[112px] flex items-center justify-center p-4">
                         {currentWish}
                     </p>
+                  )}
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-4 w-full mt-4">
@@ -210,6 +264,25 @@ export default function GreetingPage({ wish: initialWish }: { wish: string }) {
                         Copy Wish
                     </Button>
                 </div>
+
+                 <div className="w-full border-t border-primary/20 my-2" />
+
+                <div className="flex flex-col gap-4 w-full">
+                  <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
+                  <Button variant="outline" className="w-full" onClick={handleUploadClick}>
+                    <Upload className="mr-2 h-4 w-4" />
+                    {uploadedImage ? "Change Photo" : "Upload a Photo"}
+                  </Button>
+
+                  {uploadedImage && (
+                    <Button onClick={handlePersonalize} disabled={isPersonalizing} className="w-full bg-amber-500 text-black hover:bg-amber-500/90">
+                      {isPersonalizing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
+                      Personalize with AI
+                    </Button>
+                  )}
+                </div>
+
+
             </CardContent>
         </Card>
       </div>

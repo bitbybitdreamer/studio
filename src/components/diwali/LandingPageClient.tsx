@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Loader2 } from 'lucide-react';
 import FireworksBackground from "./FireworksBackground";
+import { generateWish } from "@/ai/flows/generate-wish";
 
 type Blast = {
   id: number;
@@ -57,6 +58,18 @@ export default function LandingPageClient() {
     if (typeof window !== 'undefined') {
       setIsMobile(window.innerWidth < 768);
     }
+    
+    // Generate initial wish on the client-side to avoid blocking server render
+    setIsLoading(true);
+    generateWish({ occasion: 'Diwali' })
+      .then(result => {
+        if (result.wish) {
+          setWish(result.wish);
+        }
+      })
+      .catch(err => console.error("Initial wish generation failed:", err))
+      .finally(() => setIsLoading(false));
+
   }, []);
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
@@ -83,8 +96,6 @@ export default function LandingPageClient() {
   };
 
   const handleSurpriseClick = (e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-
     const newBlast: Blast = {
       id: Date.now(),
       x: e.clientX,
@@ -92,7 +103,6 @@ export default function LandingPageClient() {
       color: COLORS[Math.floor(Math.random() * COLORS.length)],
     };
     setBlasts(prev => [...prev, newBlast]);
-
     router.push(`/greeting?wish=${encodeURIComponent(wish)}`);
   };
 
