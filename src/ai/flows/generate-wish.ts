@@ -33,10 +33,11 @@ const prompt = ai.definePrompt({
   name: 'generateWishPrompt',
   input: {schema: GenerateWishInputSchema},
   output: {schema: GenerateWishOutputSchema},
-  prompt: `You are a wish generator. Generate a new, unique, heartwarming, friendly, and universally shareable wish for {{{occasion}}}. The wish should be a single, complete sentence that is positive, uplifting, and ends with a relevant emoji.`,
+  prompt: `You are a wish generator. Generate a new, unique, heartwarming, friendly, and universally shareable wish for {{{occasion}}}. The wish must be a single, complete sentence that is positive, uplifting, and must end with a relevant emoji.`,
 });
 
-const EMOJI_REGEX = /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/;
+// A more robust regex to detect a wide range of emojis at the end of a string.
+const EMOJI_REGEX = /(\p{Emoji_Presentation}|\p{Extended_Pictographic})\s*$/u;
 const FALLBACK_EMOJIS = ['✨', '💖', '🎉', '🪔', '⭐', '🎊'];
 const FALLBACK_WISH = "Wishing you a Diwali that brings happiness, prosperity, and joy to you and your family. ✨";
 
@@ -50,19 +51,23 @@ const generateWishFlow = ai.defineFlow(
   async input => {
     try {
       const {output} = await prompt(input);
+
+      // If AI returns a valid wish, process it.
       if (output && output.wish) {
           // Check if the wish already ends with an emoji.
-          if (!EMOJI_REGEX.test(output.wish.slice(-2))) {
+          if (!EMOJI_REGEX.test(output.wish)) {
               const randomEmoji = FALLBACK_EMOJIS[Math.floor(Math.random() * FALLBACK_EMOJIS.length)];
-              output.wish = `${output.wish.replace(/[.,!?:;]*$/, '')} ${randomEmoji}`;
+              // Append a random emoji if one is missing.
+              output.wish = `${output.wish.replace(/[.,!?:; ]*$/, '')} ${randomEmoji}`;
           }
           return output;
       }
     } catch (error) {
-      console.error("AI wish generation failed:", error);
+      // Log the error for debugging, but don't let it crash the app.
+      console.error("AI wish generation failed, returning fallback:", error);
     }
     
-    // Fallback if AI fails or returns an empty wish
+    // If the AI fails for any reason (error, empty output), return a safe fallback wish.
     return { wish: FALLBACK_WISH };
   }
 );
