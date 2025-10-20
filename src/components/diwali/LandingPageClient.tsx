@@ -120,7 +120,7 @@ export default function LandingPageClient() {
       <div
         ref={contentRef}
         style={parallaxStyle}
-        className="transition-transform duration-500 ease-out z-10 flex flex-col items-center text-center"
+        className="transition-transform duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] z-10 flex flex-col items-center text-center"
       >
         <div className="z-10 flex flex-col items-center gap-6 text-center">
             <h1 className="font-headline text-6xl md:text-8xl text-primary tracking-wider animate-fade-in-down">
@@ -159,23 +159,29 @@ export default function LandingPageClient() {
           animation: fade-in-down 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
         @keyframes fade-in-down {
-          from { opacity: 0; transform: translateY(-20px); }
-          to { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
         }
         .animate-fade-in-up {
           animation: fade-in-up 1s 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
           opacity: 0;
         }
         @keyframes fade-in-up {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; transform: translateY(20px) scale(0.95); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
         }
         .animate-pulse {
-          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+          animation: pulse 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
         @keyframes pulse {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: .85; transform: scale(1.02); }
+          0%, 100% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 hsl(var(--accent) / 0.7);
+          }
+          50% {
+            transform: scale(1.02);
+            box-shadow: 0 0 0 10px hsl(var(--accent) / 0);
+          }
         }
         @keyframes blast {
           from { transform: scale(0) rotate(0deg); opacity: 1; }

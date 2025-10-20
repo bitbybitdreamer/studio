@@ -202,7 +202,7 @@ export default function GreetingPage({ initialWish }: { initialWish: string }) {
       <div style={{ perspective: '1200px' }}>
         <Card
             ref={cardRef}
-            className="w-full max-w-md bg-card/80 backdrop-blur-sm border-primary/30 shadow-2xl shadow-primary/10 transition-transform duration-500 ease-out"
+            className="w-full max-w-md bg-card/80 backdrop-blur-sm border-primary/30 shadow-2xl shadow-primary/10 transition-transform duration-300 ease-[cubic-bezier(0.25,1,0.5,1)]"
             style={parallaxStyle}
         >
           <Button variant="ghost" size="icon" className="absolute top-4 left-4" onClick={handleBackClick}>
