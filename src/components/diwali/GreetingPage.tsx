@@ -21,8 +21,6 @@ type Blast = {
 const COLORS = ['#FFD700', '#D97706', '#FF69B4', '#00BFFF', '#FF4500'];
 
 const BlastParticle = ({ onComplete }: { onComplete: () => void }) => {
-  const particleCount = 20;
-
   useEffect(() => {
     const timer = setTimeout(onComplete, 1200);
     return () => clearTimeout(timer);
@@ -30,8 +28,8 @@ const BlastParticle = ({ onComplete }: { onComplete: () => void }) => {
 
   return (
     <>
-      {Array.from({ length: particleCount }).map((_, i) => {
-        const angle = (360 / particleCount) * i + (Math.random() - 0.5) * 10;
+      {Array.from({ length: 20 }).map((_, i) => {
+        const angle = (360 / 20) * i + (Math.random() - 0.5) * 10;
         const distance = Math.random() * 50 + 70;
         const rotation = Math.random() * 360;
         return (
@@ -68,7 +66,9 @@ export default function GreetingPage({ wish }: { wish: string }) {
   const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
-    setIsMobile(window.innerWidth < 768);
+    if (typeof window !== 'undefined') {
+      setIsMobile(window.innerWidth < 768);
+    }
   }, []);
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
@@ -167,24 +167,12 @@ export default function GreetingPage({ wish }: { wish: string }) {
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-      <style jsx>{`
-        @keyframes blast {
-          from {
-            transform: scale(0) rotate(0deg);
-            opacity: 1;
-          }
-          to {
-            transform: scale(1.2) rotate(360deg);
-            opacity: 0;
-          }
-        }
-      `}</style>
       <FireworksBackground style={backgroundParallaxStyle} />
       {blasts.map((blast) => (
         <div
           key={blast.id}
-          className="absolute"
-          style={{ left: blast.x, top: blast.y, color: blast.color }}
+          className="absolute z-20"
+          style={{ left: blast.x, top: blast.y, color: blast.color, transform: 'translate(-50%, -50%)' }}
         >
           <BlastParticle onComplete={() => removeBlast(blast.id)} />
         </div>
@@ -240,6 +228,18 @@ export default function GreetingPage({ wish }: { wish: string }) {
             <p>Built with love.</p>
             <p>Move your cursor for a 3D effect.</p>
         </footer>
+        <style jsx>{`
+            @keyframes blast {
+              from {
+                transform: scale(0) rotate(0deg);
+                opacity: 1;
+              }
+              to {
+                transform: scale(1.2) rotate(360deg);
+                opacity: 0;
+              }
+            }
+        `}</style>
     </main>
   );
 }

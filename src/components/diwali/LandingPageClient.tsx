@@ -15,8 +15,6 @@ type Blast = {
 const COLORS = ['#FFD700', '#D97706', '#FF69B4', '#00BFFF', '#FF4500'];
 
 const BlastParticle = ({ onComplete }: { onComplete: () => void }) => {
-  const particleCount = 20;
-
   useEffect(() => {
     const timer = setTimeout(onComplete, 1200);
     return () => clearTimeout(timer);
@@ -24,8 +22,8 @@ const BlastParticle = ({ onComplete }: { onComplete: () => void }) => {
 
   return (
     <>
-      {Array.from({ length: particleCount }).map((_, i) => {
-        const angle = (360 / particleCount) * i + (Math.random() - 0.5) * 10;
+      {Array.from({ length: 20 }).map((_, i) => {
+        const angle = (360 / 20) * i + (Math.random() - 0.5) * 10;
         const distance = Math.random() * 50 + 70;
         const rotation = Math.random() * 360;
         return (
@@ -33,6 +31,7 @@ const BlastParticle = ({ onComplete }: { onComplete: () => void }) => {
             key={i}
             className="absolute h-2 w-2 rounded-full"
             style={{
+              backgroundColor: 'currentColor',
               transform: `rotate(${angle}deg) translateX(${distance}px) rotate(${rotation}deg) scale(0)`,
               animation: `blast 1.2s cubic-bezier(0.19, 1, 0.22, 1) forwards`,
             }}
@@ -53,7 +52,10 @@ export default function LandingPageClient({ children }: { children: ReactNode })
   const [blasts, setBlasts] = useState<Blast[]>([]);
 
   useEffect(() => {
-    setIsMobile(window.innerWidth < 768);
+    // This check ensures window is defined, preventing server-side errors.
+    if (typeof window !== 'undefined') {
+      setIsMobile(window.innerWidth < 768);
+    }
   }, []);
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
@@ -65,7 +67,7 @@ export default function LandingPageClient({ children }: { children: ReactNode })
     const xPos = (clientX / offsetWidth - 0.5) * 2;
     const yPos = (clientY / offsetHeight - 0.5) * 2;
 
-    const rotateY = xPos * 10; // Reduced rotation for a subtler effect
+    const rotateY = xPos * 10; 
     const rotateX = yPos * -10;
 
     setParallaxStyle({
@@ -83,21 +85,21 @@ export default function LandingPageClient({ children }: { children: ReactNode })
     const target = e.target as HTMLElement;
     const button = target.closest('button');
 
-    if (button && button.innerText.includes("Time for a Surprise!")) {
-        e.preventDefault();
-        
-        const newBlast: Blast = {
-          id: Date.now(),
-          x: e.clientX,
-          y: e.clientY,
-          color: COLORS[Math.floor(Math.random() * COLORS.length)],
-        };
-        setBlasts(prev => [...prev, newBlast]);
+    if (button) {
+      e.preventDefault();
+      
+      const newBlast: Blast = {
+        id: Date.now(),
+        x: e.clientX,
+        y: e.clientY,
+        color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      };
+      setBlasts(prev => [...prev, newBlast]);
 
-        setIsExiting(true);
-        setTimeout(() => {
-            router.push('/greeting');
-        }, 500); // Corresponds to the animation duration
+      setIsExiting(true);
+      setTimeout(() => {
+          router.push('/greeting');
+      }, 500); 
     }
   };
 
@@ -115,23 +117,30 @@ export default function LandingPageClient({ children }: { children: ReactNode })
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
+        <div
+          // This div captures the click event for the button inside children
+          onClick={handleSurpriseClick}
+          className="relative z-10"
+        >
+          <div
+            ref={contentRef}
+            style={parallaxStyle}
+            className="transition-transform duration-500 ease-out"
+          >
+              {children}
+          </div>
+        </div>
+
         {blasts.map((blast) => (
             <div
               key={blast.id}
-              className="absolute"
-              style={{ left: blast.x, top: blast.y, color: blast.color }}
+              className="absolute z-20"
+              style={{ left: blast.x, top: blast.y, color: blast.color, transform: 'translate(-50%, -50%)' }}
             >
               <BlastParticle onComplete={() => removeBlast(blast.id)} />
             </div>
         ))}
-        <div
-          ref={contentRef}
-          style={parallaxStyle}
-          className="transition-transform duration-500 ease-out z-10"
-          onClick={handleSurpriseClick}
-        >
-            {children}
-        </div>
+      
       <style jsx>{`
         @keyframes fade-in-down {
           from {
