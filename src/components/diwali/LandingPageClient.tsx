@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useRef, CSSProperties, MouseEvent } from "react";
@@ -72,12 +73,14 @@ export default function LandingPageClient() {
 
     setParallaxStyle({
       transform: `perspective(1500px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`,
+      transition: 'transform 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
     });
   };
 
   const handleMouseLeave = () => {
     setParallaxStyle({
       transform: 'perspective(1500px) rotateX(0deg) rotateY(0deg) scale(1)',
+      transition: 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
     });
   };
 
@@ -107,7 +110,7 @@ export default function LandingPageClient() {
       <div
         ref={contentRef}
         style={parallaxStyle}
-        className="transition-transform duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] z-10 flex flex-col items-center text-center"
+        className="z-10 flex flex-col items-center text-center"
       >
         <div className="z-10 flex flex-col items-center gap-6 text-center">
             <h1 className="font-headline text-6xl md:text-8xl text-primary tracking-wider animate-fade-in-down">
@@ -143,14 +146,14 @@ export default function LandingPageClient() {
         </footer>
       <style jsx>{`
         .animate-fade-in-down {
-          animation: fade-in-down 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+          animation: fade-in-down 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
         @keyframes fade-in-down {
           from { opacity: 0; transform: translateY(-20px) scale(0.95); }
           to { opacity: 1; transform: translateY(0) scale(1); }
         }
         .animate-fade-in-up {
-          animation: fade-in-up 1s 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+          animation: fade-in-up 1s 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
           opacity: 0;
         }
         @keyframes fade-in-up {
@@ -166,7 +169,7 @@ export default function LandingPageClient() {
             box-shadow: 0 0 0 0 hsl(var(--accent) / 0.7);
           }
           50% {
-            transform: scale(1.02);
+            transform: scale(1.05);
             box-shadow: 0 0 0 10px hsl(var(--accent) / 0);
           }
         }
