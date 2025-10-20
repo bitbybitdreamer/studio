@@ -6,9 +6,10 @@ import { Suspense } from "react";
 
 function GreetingContent() {
   const searchParams = useSearchParams();
-  const wish = searchParams.get('wish') || "May your days be filled with joy, laughter, and endless good fortune! ✨";
+  const wish = searchParams.get('wish');
+  const initialWish = wish || "May your days be filled with joy, laughter, and endless good fortune! ✨";
 
-  return <GreetingPage initialWish={wish} />;
+  return <GreetingPage initialWish={initialWish} />;
 }
 
 export default function Greeting() {
