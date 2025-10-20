@@ -1,9 +1,11 @@
+
 "use client";
 
 import { useState, useEffect, useRef, CSSProperties, MouseEvent } from "react";
+import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PartyPopper, Share2, Copy, Loader2 } from "lucide-react";
+import { PartyPopper, Share2, Copy, Loader2, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import FireworksBackground from "./FireworksBackground";
 import { cn } from "@/lib/utils";
@@ -163,6 +165,11 @@ export default function GreetingPage({ wish }: { wish: string }) {
             className="w-full max-w-md bg-card/80 backdrop-blur-sm border-primary/30 shadow-2xl shadow-primary/10 transition-transform duration-300 ease-out"
             style={parallaxStyle}
         >
+          <Link href="/" passHref>
+              <Button variant="ghost" size="icon" className="absolute top-4 left-4">
+                  <ArrowLeft />
+              </Button>
+          </Link>
             <CardContent className="p-8 text-center flex flex-col items-center gap-6">
             <h1 className="font-headline text-4xl text-primary tracking-wider">
                 A Wish For You
@@ -207,3 +214,6 @@ export default function GreetingPage({ wish }: { wish: string }) {
     </main>
   );
 }
+
+
+    
