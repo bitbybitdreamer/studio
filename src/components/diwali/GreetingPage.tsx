@@ -11,7 +11,6 @@ import FireworksBackground from "./FireworksBackground";
 import { cn } from "@/lib/utils";
 import { generateWish } from "@/ai/flows/generate-wish";
 import { personalizeImage } from "@/ai/flows/personalize-image-flow";
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 
 
 type Blast = {
@@ -76,14 +75,11 @@ export default function GreetingPage({ wish }: { wish: string }) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setIsMobile(window.innerWidth < 768);
-    }
-  }, []);
-  
-  useEffect(() => {
-    const isExiting = sessionStorage.getItem('isExiting');
-    if (isExiting) {
-      sessionStorage.removeItem('isExiting');
-      setIsExiting(false);
+      const exiting = sessionStorage.getItem('isExiting');
+      if (exiting) {
+        sessionStorage.removeItem('isExiting');
+        setIsExiting(false);
+      }
     }
   }, []);
 
@@ -131,6 +127,7 @@ export default function GreetingPage({ wish }: { wish: string }) {
       const result = await generateWish({ occasion: 'a happy occasion' });
       if (result.wish) {
         setCurrentWish(result.wish);
+        setPersonalizedImage(null); // Clear personalized image when wish changes
       }
     } catch (error) {
       console.error("Failed to generate new wish:", error);
@@ -149,11 +146,10 @@ export default function GreetingPage({ wish }: { wish: string }) {
   };
 
   const handleCopyWish = () => {
-    const textToCopy = personalizedImage || currentWish;
-    navigator.clipboard.writeText(textToCopy).then(() => {
+    navigator.clipboard.writeText(currentWish).then(() => {
         toast({
             title: "Copied!",
-            description: personalizedImage ? "Your personalized image is ready to be shared!" : "The wish has been copied to your clipboard.",
+            description: "The wish has been copied to your clipboard.",
         });
     }).catch(err => {
         console.error("Failed to copy:", err);
@@ -252,19 +248,17 @@ export default function GreetingPage({ wish }: { wish: string }) {
                     A Wish For You
                 </h1>
                 
-                {personalizedImage ? (
-                    <div className="relative w-full aspect-square rounded-lg overflow-hidden border border-primary/20">
+                <div className="relative w-full aspect-square rounded-lg overflow-hidden border border-primary/20 flex items-center justify-center">
+                    {personalizedImage ? (
                         <Image src={personalizedImage} alt="Personalized greeting" layout="fill" objectFit="contain" />
-                    </div>
-                ) : uploadedImage ? (
-                     <div className="relative w-full aspect-square rounded-lg overflow-hidden border border-dashed border-accent/50">
+                    ) : uploadedImage ? (
                         <Image src={uploadedImage} alt="Uploaded preview" layout="fill" objectFit="contain" />
-                    </div>
-                ) : (
-                    <p className="font-body text-lg leading-relaxed text-foreground min-h-[112px]">
-                        {currentWish}
-                    </p>
-                )}
+                    ) : (
+                        <p className="font-body text-lg leading-relaxed text-foreground min-h-[112px] flex items-center justify-center p-4">
+                            {currentWish}
+                        </p>
+                    )}
+                </div>
 
 
                 <div className="flex flex-col sm:flex-row gap-4 w-full mt-4">
@@ -283,7 +277,7 @@ export default function GreetingPage({ wish }: { wish: string }) {
                     </Button>
                     <Button onClick={handleCopyWish} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all">
                         <Copy className="mr-2 h-4 w-4" />
-                        Copy
+                        Copy Wish
                     </Button>
                 </div>
                 
