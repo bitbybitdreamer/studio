@@ -89,6 +89,7 @@ export default function LandingPageClient() {
       color: COLORS[Math.floor(Math.random() * COLORS.length)],
     };
     setBlasts(prev => [...prev, newBlast]);
+    
     router.push(`/greeting?wish=${encodeURIComponent(wish)}`);
   };
 
