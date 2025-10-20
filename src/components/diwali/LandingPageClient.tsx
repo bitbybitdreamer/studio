@@ -49,7 +49,6 @@ export default function LandingPageClient() {
   const contentRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [parallaxStyle, setParallaxStyle] = useState<CSSProperties>({});
-  const [isExiting, setIsExiting] = useState(false);
   const [blasts, setBlasts] = useState<Blast[]>([]);
   const [wish, setWish] = useState("Wishing you a Diwali that shines as brightly as your spirit, bringing peace and happiness! 🪔");
   const [isLoading, setIsLoading] = useState(false);
@@ -94,10 +93,7 @@ export default function LandingPageClient() {
     };
     setBlasts(prev => [...prev, newBlast]);
 
-    setIsExiting(true);
-    setTimeout(() => {
-      router.push(`/greeting?wish=${encodeURIComponent(wish)}`);
-    }, 500); // Animation duration
+    router.push(`/greeting?wish=${encodeURIComponent(wish)}`);
   };
 
   const removeBlast = (id: number) => {
@@ -106,10 +102,7 @@ export default function LandingPageClient() {
 
   return (
     <main
-      className={cn(
-        "flex min-h-screen flex-col items-center justify-center p-4 overflow-hidden relative transition-opacity duration-500 ease-in-out",
-        isExiting ? "opacity-0" : "opacity-100"
-      )}
+      className="flex min-h-screen flex-col items-center justify-center p-4 overflow-hidden relative"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >

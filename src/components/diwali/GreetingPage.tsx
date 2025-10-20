@@ -55,7 +55,6 @@ export default function GreetingPage({ wish: initialWish }: { wish: string }) {
   const router = useRouter();
 
   const [isMobile, setIsMobile] = useState(false);
-  const [isExiting, setIsExiting] = useState(false);
 
   const [parallaxStyle, setParallaxStyle] = useState<CSSProperties>({});
   const [backgroundParallaxStyle, setBackgroundParallaxStyle] = useState<CSSProperties>({});
@@ -68,11 +67,6 @@ export default function GreetingPage({ wish: initialWish }: { wish: string }) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setIsMobile(window.innerWidth < 768);
-      const exiting = sessionStorage.getItem('isExiting');
-      if (exiting) {
-        sessionStorage.removeItem('isExiting');
-        setIsExiting(false);
-      }
     }
   }, []);
 
@@ -117,7 +111,7 @@ export default function GreetingPage({ wish: initialWish }: { wish: string }) {
 
     setIsGenerating(true);
     try {
-      const result = await generateWish({ occasion: 'a unique and surprising Diwali' });
+      const result = await generateWish({ occasion: 'Diwali' });
       if (result.wish) {
         setCurrentWish(result.wish);
       } else {
@@ -128,7 +122,7 @@ export default function GreetingPage({ wish: initialWish }: { wish: string }) {
       toast({
         variant: "destructive",
         title: "Oh no! Wish generation failed.",
-        description: "The AI couldn't create a new wish for you. Please try again.",
+        description: "The AI couldn't create a new wish. Please try again.",
       });
     } finally {
       setIsGenerating(false);
@@ -156,20 +150,13 @@ export default function GreetingPage({ wish: initialWish }: { wish: string }) {
   };
 
   const handleBackClick = () => {
-    setIsExiting(true);
-    sessionStorage.setItem('isExiting', 'true');
-    setTimeout(() => {
-      router.push('/');
-    }, 500);
+    router.push('/');
   };
   
 
   return (
     <main
-      className={cn(
-        "flex min-h-screen flex-col items-center justify-center p-4 overflow-hidden relative transition-opacity duration-500 ease-in-out",
-        isExiting ? 'opacity-0' : 'opacity-100'
-      )}
+      className="flex min-h-screen flex-col items-center justify-center p-4 overflow-hidden relative"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
