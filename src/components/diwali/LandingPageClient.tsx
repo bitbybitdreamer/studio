@@ -44,7 +44,7 @@ export default function LandingPageClient({ children }: { children: ReactNode })
         <div
           ref={contentRef}
           style={parallaxStyle}
-          className="transition-transform duration-300 ease-out"
+          className="transition-transform duration-500 ease-out"
         >
             {children}
         </div>
@@ -70,10 +70,10 @@ export default function LandingPageClient({ children }: { children: ReactNode })
           }
         }
         .animate-fade-in-down {
-          animation: fade-in-down 1s ease-out forwards;
+          animation: fade-in-down 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
         .animate-fade-in-up {
-          animation: fade-in-up 1s 0.5s ease-out forwards;
+          animation: fade-in-up 1s 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
           opacity: 0;
         }
         .animate-pulse {
@@ -82,9 +82,11 @@ export default function LandingPageClient({ children }: { children: ReactNode })
         @keyframes pulse {
             0%, 100% {
                 opacity: 1;
+                transform: scale(1);
             }
             50% {
-                opacity: .8;
+                opacity: .85;
+                transform: scale(1.02);
             }
         }
       `}</style>

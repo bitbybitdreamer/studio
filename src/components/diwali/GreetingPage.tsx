@@ -21,25 +21,26 @@ type Blast = {
 const COLORS = ['#FFD700', '#D97706', '#FF69B4', '#00BFFF', '#FF4500'];
 
 const BlastParticle = ({ onComplete }: { onComplete: () => void }) => {
-  const particleCount = 15;
+  const particleCount = 20;
 
   useEffect(() => {
-    const timer = setTimeout(onComplete, 1000);
+    const timer = setTimeout(onComplete, 1200);
     return () => clearTimeout(timer);
   }, [onComplete]);
 
   return (
     <>
       {Array.from({ length: particleCount }).map((_, i) => {
-        const angle = (360 / particleCount) * i;
-        const distance = Math.random() * 40 + 60;
+        const angle = (360 / particleCount) * i + (Math.random() - 0.5) * 10;
+        const distance = Math.random() * 50 + 70;
+        const rotation = Math.random() * 360;
         return (
           <div
             key={i}
-            className="absolute h-1.5 w-1.5 rounded-full"
+            className="absolute h-2 w-2 rounded-full"
             style={{
-              transform: `rotate(${angle}deg) translateX(${distance}px) scale(0)`,
-              animation: `blast 1s ease-out forwards`,
+              transform: `rotate(${angle}deg) translateX(${distance}px) rotate(${rotation}deg) scale(0)`,
+              animation: `blast 1.2s cubic-bezier(0.19, 1, 0.22, 1) forwards`,
             }}
           />
         );
@@ -76,15 +77,24 @@ export default function GreetingPage({ wish }: { wish: string }) {
     const xPos = (clientX / offsetWidth - 0.5) * 2;
     const yPos = (clientY / offsetHeight - 0.5) * 2;
 
-    const rotateY = xPos * 15;
-    const rotateX = yPos * -15;
+    const rotateY = xPos * 12;
+    const rotateX = yPos * -12;
 
     setParallaxStyle({
       transform: `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
     });
     
     setBackgroundParallaxStyle({
-      transform: `translateX(${xPos * -25}px) translateY(${yPos * -25}px)`
+      transform: `translateX(${xPos * -20}px) translateY(${yPos * -20}px)`
+    });
+  };
+  
+  const handleMouseLeave = () => {
+    setParallaxStyle({
+      transform: `perspective(1200px) rotateX(0deg) rotateY(0deg)`,
+    });
+    setBackgroundParallaxStyle({
+      transform: `translateX(0px) translateY(0px)`
     });
   };
 
@@ -147,7 +157,20 @@ export default function GreetingPage({ wish }: { wish: string }) {
     <main
       className="flex min-h-screen flex-col items-center justify-center p-4 overflow-hidden relative"
       onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
     >
+      <style jsx>{`
+        @keyframes blast {
+          from {
+            transform: scale(0) rotate(0deg);
+            opacity: 1;
+          }
+          to {
+            transform: scale(1.2) rotate(360deg);
+            opacity: 0;
+          }
+        }
+      `}</style>
       <FireworksBackground style={backgroundParallaxStyle} />
       {blasts.map((blast) => (
         <div
@@ -162,7 +185,7 @@ export default function GreetingPage({ wish }: { wish: string }) {
       <div style={{ perspective: '1200px' }}>
         <Card
             ref={cardRef}
-            className="w-full max-w-md bg-card/80 backdrop-blur-sm border-primary/30 shadow-2xl shadow-primary/10 transition-transform duration-300 ease-out"
+            className="w-full max-w-md bg-card/80 backdrop-blur-sm border-primary/30 shadow-2xl shadow-primary/10 transition-transform duration-500 ease-out"
             style={parallaxStyle}
         >
           <Link href="/" passHref>
@@ -180,7 +203,7 @@ export default function GreetingPage({ wish }: { wish: string }) {
             <div className="flex flex-col sm:flex-row gap-4 w-full mt-4">
                 <Button
                     variant="outline"
-                    className="w-full border-accent text-accent hover:bg-accent hover:text-accent-foreground"
+                    className="w-full border-accent text-accent hover:bg-accent hover:text-accent-foreground transition-all"
                     onClick={handleBlastClick}
                     disabled={isGenerating}
                 >
@@ -191,7 +214,7 @@ export default function GreetingPage({ wish }: { wish: string }) {
                     )}
                     Tap for a Surprise!
                 </Button>
-                <Button onClick={handleShare} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+                <Button onClick={handleShare} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all">
                     {isCopied ? (
                         <>
                             <Copy className="mr-2 h-4 w-4" /> Copied!
@@ -214,6 +237,3 @@ export default function GreetingPage({ wish }: { wish: string }) {
     </main>
   );
 }
-
-
-    
