@@ -184,7 +184,7 @@ export default function GreetingPage({ wish }: { wish: string }) {
         toast({
             variant: "destructive",
             title: "AI Image Generation Failed",
-            description: "Could not create an image for your wish. Please try again.",
+            description: "The AI failed to create an image for your wish. Please try again.",
         });
     } finally {
         setIsGeneratingImage(false);
@@ -226,9 +226,14 @@ export default function GreetingPage({ wish }: { wish: string }) {
                     A Wish For You
                 </h1>
                 
-                <div className="relative w-full aspect-square rounded-lg overflow-hidden border border-primary/20 flex items-center justify-center">
-                    {generatedImage ? (
-                        <Image src={generatedImage} alt="Generated greeting image" layout="fill" objectFit="contain" />
+                <div className="relative w-full aspect-square rounded-lg overflow-hidden border border-primary/20 flex items-center justify-center bg-background/30">
+                    {isGeneratingImage ? (
+                        <div className="flex flex-col items-center gap-4 text-center">
+                            <Loader2 className="h-10 w-10 animate-spin text-primary"/>
+                            <p className="text-sm text-muted-foreground">Generating your image...</p>
+                        </div>
+                    ) : generatedImage ? (
+                        <Image src={generatedImage} alt="Generated greeting image" layout="fill" objectFit="cover" />
                     ) : (
                         <p className="font-body text-lg leading-relaxed text-foreground min-h-[112px] flex items-center justify-center p-4">
                             {currentWish}
