@@ -62,6 +62,7 @@ export default function GreetingPage({ initialWish }: { initialWish: string }) {
   const [currentWish, setCurrentWish] = useState(initialWish);
   const [displayedWish, setDisplayedWish] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const animationIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -70,21 +71,31 @@ export default function GreetingPage({ initialWish }: { initialWish: string }) {
   }, []);
 
   useEffect(() => {
+    if (animationIntervalRef.current) {
+        clearInterval(animationIntervalRef.current);
+    }
     setDisplayedWish("");
     const words = currentWish.split(/(\s+)/);
     let currentIndex = 0;
 
     if (words.length > 0) {
-      const interval = setInterval(() => {
+      animationIntervalRef.current = setInterval(() => {
         if (currentIndex < words.length) {
           setDisplayedWish(prev => prev + words[currentIndex]);
           currentIndex++;
         } else {
-          clearInterval(interval);
+          if (animationIntervalRef.current) {
+             clearInterval(animationIntervalRef.current);
+          }
         }
       }, 50); 
-      return () => clearInterval(interval);
     }
+    
+    return () => {
+        if (animationIntervalRef.current) {
+            clearInterval(animationIntervalRef.current);
+        }
+    };
   }, [currentWish]);
 
 
@@ -204,7 +215,6 @@ export default function GreetingPage({ initialWish }: { initialWish: string }) {
                 
                 <p className="font-body text-lg leading-relaxed text-foreground min-h-[112px] flex items-center justify-center p-4">
                   {displayedWish}
-                  <span className="animate-pulse">|</span>
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 w-full mt-4">
