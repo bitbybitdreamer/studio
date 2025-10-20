@@ -59,7 +59,6 @@ export default function GreetingPage({ wish }: { wish: string }) {
   const [backgroundParallaxStyle, setBackgroundParallaxStyle] = useState<CSSProperties>({});
   
   const [blasts, setBlasts] = useState<Blast[]>([]);
-  const [isCopied, setIsCopied] = useState(false);
 
   const [currentWish, setCurrentWish] = useState(wish);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -134,12 +133,10 @@ export default function GreetingPage({ wish }: { wish: string }) {
 
   const handleCopyWish = () => {
     navigator.clipboard.writeText(currentWish).then(() => {
-        setIsCopied(true);
         toast({
             title: "Wish Copied!",
             description: "The wish has been copied to your clipboard.",
         });
-        setTimeout(() => setIsCopied(false), 2000);
     }).catch(err => {
         console.error("Failed to copy:", err);
         toast({
@@ -210,7 +207,7 @@ export default function GreetingPage({ wish }: { wish: string }) {
                 </Button>
                 <Button onClick={handleCopyWish} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all">
                     <Copy className="mr-2 h-4 w-4" />
-                    {isCopied ? "Copied!" : "Copy Wish"}
+                    Copy Wish
                 </Button>
             </div>
             </CardContent>
