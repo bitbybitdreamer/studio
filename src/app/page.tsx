@@ -1,5 +1,4 @@
 
-import Link from 'next/link';
 import { generateWish } from '@/ai/flows/generate-wish';
 import { Button } from '@/components/ui/button';
 import FireworksBackground from '@/components/diwali/FireworksBackground';
@@ -28,15 +27,13 @@ export default async function LandingPage() {
         <p className="font-body text-lg md:text-xl leading-relaxed text-foreground max-w-2xl animate-fade-in-up">
           {wish}
         </p>
-        <Link href="/greeting" passHref>
-          <Button
-            size="lg"
-            className="mt-6 bg-accent text-accent-foreground hover:bg-accent/90 animate-pulse"
-          >
-            Time for a Surprise!
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
-        </Link>
+        <Button
+          size="lg"
+          className="mt-6 bg-accent text-accent-foreground hover:bg-accent/90 animate-pulse"
+        >
+          Time for a Surprise!
+          <ArrowRight className="ml-2 h-5 w-5" />
+        </Button>
       </div>
     </LandingPageClient>
   );

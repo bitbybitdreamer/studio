@@ -39,12 +39,18 @@ export default function LandingPageClient({ children }: { children: ReactNode })
     });
   };
 
-  const handleSurpriseClick = (e: MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    setIsExiting(true);
-    setTimeout(() => {
-      router.push('/greeting');
-    }, 500); // Corresponds to the animation duration
+  const handleSurpriseClick = (e: MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    const button = target.closest('button');
+
+    // Check if the clicked element is the surprise button
+    if (button && button.innerText.includes("Time for a Surprise!")) {
+        e.preventDefault();
+        setIsExiting(true);
+        setTimeout(() => {
+            router.push('/greeting');
+        }, 500); // Corresponds to the animation duration
+    }
   };
 
   return (
@@ -60,13 +66,7 @@ export default function LandingPageClient({ children }: { children: ReactNode })
           ref={contentRef}
           style={parallaxStyle}
           className="transition-transform duration-500 ease-out"
-          onClick={(e) => {
-            const target = e.target as HTMLElement;
-            const link = target.closest('a');
-            if (link && link.href.endsWith('/greeting')) {
-                handleSurpriseClick(e as any);
-            }
-          }}
+          onClick={handleSurpriseClick}
         >
             {children}
         </div>
