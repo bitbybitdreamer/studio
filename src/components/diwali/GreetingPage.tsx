@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef, CSSProperties, MouseEvent } from "react";
@@ -215,7 +214,7 @@ export default function GreetingPage({ wish }: { wish: string }) {
       </div>
 
        <footer className="absolute bottom-4 text-center text-xs text-muted-foreground/50">
-            <p>Built with love.</p>
+            <p>Created by - Bishnu</p>
             <p>Move your cursor for a 3D effect.</p>
         </footer>
         <style jsx>{`

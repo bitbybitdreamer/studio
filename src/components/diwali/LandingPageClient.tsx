@@ -145,6 +145,10 @@ export default function LandingPageClient({ initialWish }: { initialWish: string
         </div>
       ))}
       
+       <footer className="absolute bottom-4 text-center text-xs text-muted-foreground/50">
+            <p>Created by - Bishnu</p>
+            <p>Move your cursor for a 3D effect.</p>
+        </footer>
       <style jsx>{`
         .animate-fade-in-down {
           animation: fade-in-down 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
