@@ -32,7 +32,7 @@ const prompt = ai.definePrompt({
   name: 'generateDiwaliWishPrompt',
   input: {schema: GenerateDiwaliWishInputSchema},
   output: {schema: GenerateDiwaliWishOutputSchema},
-  prompt: `You are a Diwali wish generator. Generate a heartwarming, family-friendly Diwali wish for the occasion of {{{occasion}}}. The wish should be suitable for sharing with friends and family.`,
+  prompt: `You are a Diwali wish generator. Generate a heartwarming, family-friendly Diwali wish for the occasion of {{{occasion}}}. The wish must be a single, complete sentence. The response must be a JSON object with a "wish" property containing the generated wish.`,
 });
 
 const generateDiwaliWishFlow = ai.defineFlow(
@@ -43,6 +43,8 @@ const generateDiwaliWishFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
-    return output!;
+    
+    // Ensure we always return a valid object, even if the model output is empty.
+    return output ?? { wish: "May the festival of lights bring endless joy to your life." };
   }
 );
