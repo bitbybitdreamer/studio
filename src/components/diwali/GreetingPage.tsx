@@ -82,7 +82,7 @@ export default function GreetingPage({ initialWish }: { initialWish: string }) {
         } else {
           clearInterval(interval);
         }
-      }, 70); 
+      }, 50); 
       return () => clearInterval(interval);
     }
   }, [currentWish]);
