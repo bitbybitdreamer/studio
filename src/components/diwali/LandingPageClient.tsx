@@ -119,7 +119,7 @@ export default function LandingPageClient({ initialWish }: { initialWish: string
       >
         <div className="z-10 flex flex-col items-center gap-6 text-center">
             <h1 className="font-headline text-6xl md:text-8xl text-primary tracking-wider animate-fade-in-down">
-              Happy Diwali
+              Happy Diwali ✨
             </h1>
             <p className="font-body text-lg md:text-xl leading-relaxed text-foreground max-w-2xl animate-fade-in-up">
               {initialWish}
