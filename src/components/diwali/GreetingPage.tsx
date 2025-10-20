@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useRef, CSSProperties, MouseEvent } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PartyPopper, Share2, Copy, Loader2, ArrowLeft } from "lucide-react";
@@ -39,6 +39,7 @@ const BlastParticle = ({ onComplete }: { onComplete: () => void }) => {
             key={i}
             className="absolute h-2 w-2 rounded-full"
             style={{
+              backgroundColor: 'currentColor',
               transform: `rotate(${angle}deg) translateX(${distance}px) rotate(${rotation}deg) scale(0)`,
               animation: `blast 1.2s cubic-bezier(0.19, 1, 0.22, 1) forwards`,
             }}
@@ -53,6 +54,7 @@ const BlastParticle = ({ onComplete }: { onComplete: () => void }) => {
 export default function GreetingPage({ wish }: { wish: string }) {
   const { toast } = useToast();
   const cardRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
   
   const [parallaxStyle, setParallaxStyle] = useState<CSSProperties>({});
@@ -63,6 +65,7 @@ export default function GreetingPage({ wish }: { wish: string }) {
 
   const [currentWish, setCurrentWish] = useState(wish);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 768);
@@ -147,10 +150,20 @@ export default function GreetingPage({ wish }: { wish: string }) {
     });
   };
 
+  const handleBackClick = () => {
+    setIsExiting(true);
+    setTimeout(() => {
+      router.push('/');
+    }, 500); // Match animation duration
+  };
+
 
   return (
     <main
-      className="flex min-h-screen flex-col items-center justify-center p-4 overflow-hidden relative"
+      className={cn(
+        "flex min-h-screen flex-col items-center justify-center p-4 overflow-hidden relative transition-opacity duration-500 ease-in-out",
+        isExiting ? 'opacity-0' : 'opacity-100'
+      )}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
@@ -183,13 +196,11 @@ export default function GreetingPage({ wish }: { wish: string }) {
             className="w-full max-w-md bg-card/80 backdrop-blur-sm border-primary/30 shadow-2xl shadow-primary/10 transition-transform duration-500 ease-out"
             style={parallaxStyle}
         >
-          <Link href="/" passHref>
-              <Button variant="ghost" size="icon" className="absolute top-4 left-4">
-                  <ArrowLeft />
-              </Button>
-          </Link>
+          <Button variant="ghost" size="icon" className="absolute top-4 left-4" onClick={handleBackClick}>
+              <ArrowLeft />
+          </Button>
             <CardContent className="p-8 text-center flex flex-col items-center gap-6">
-            <h1 className="font-headline text-4xl text-primary tracking-wider">
+            <h1 className="font-headline text-4xl text-primary tracking-wider mt-8">
                 A Wish For You
             </h1>
             <p className="font-body text-lg leading-relaxed text-foreground min-h-[112px]">

@@ -5,12 +5,52 @@ import { ReactNode, useState, useEffect, useRef, CSSProperties, MouseEvent } fro
 import { useRouter } from 'next/navigation';
 import { cn } from "@/lib/utils";
 
+type Blast = {
+  id: number;
+  x: number;
+  y: number;
+  color: string;
+};
+
+const COLORS = ['#FFD700', '#D97706', '#FF69B4', '#00BFFF', '#FF4500'];
+
+const BlastParticle = ({ onComplete }: { onComplete: () => void }) => {
+  const particleCount = 20;
+
+  useEffect(() => {
+    const timer = setTimeout(onComplete, 1200);
+    return () => clearTimeout(timer);
+  }, [onComplete]);
+
+  return (
+    <>
+      {Array.from({ length: particleCount }).map((_, i) => {
+        const angle = (360 / particleCount) * i + (Math.random() - 0.5) * 10;
+        const distance = Math.random() * 50 + 70;
+        const rotation = Math.random() * 360;
+        return (
+          <div
+            key={i}
+            className="absolute h-2 w-2 rounded-full"
+            style={{
+              transform: `rotate(${angle}deg) translateX(${distance}px) rotate(${rotation}deg) scale(0)`,
+              animation: `blast 1.2s cubic-bezier(0.19, 1, 0.22, 1) forwards`,
+            }}
+          />
+        );
+      })}
+    </>
+  );
+};
+
+
 export default function LandingPageClient({ children }: { children: ReactNode }) {
   const router = useRouter();
   const contentRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [parallaxStyle, setParallaxStyle] = useState<CSSProperties>({});
   const [isExiting, setIsExiting] = useState(false);
+  const [blasts, setBlasts] = useState<Blast[]>([]);
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 768);
@@ -43,15 +83,28 @@ export default function LandingPageClient({ children }: { children: ReactNode })
     const target = e.target as HTMLElement;
     const button = target.closest('button');
 
-    // Check if the clicked element is the surprise button
     if (button && button.innerText.includes("Time for a Surprise!")) {
         e.preventDefault();
+        
+        const newBlast: Blast = {
+          id: Date.now(),
+          x: e.clientX,
+          y: e.clientY,
+          color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        };
+        setBlasts(prev => [...prev, newBlast]);
+
         setIsExiting(true);
         setTimeout(() => {
             router.push('/greeting');
         }, 500); // Corresponds to the animation duration
     }
   };
+
+  const removeBlast = (id: number) => {
+    setBlasts(prev => prev.filter(b => b.id !== id));
+  };
+
 
   return (
     <main
@@ -62,10 +115,19 @@ export default function LandingPageClient({ children }: { children: ReactNode })
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
+        {blasts.map((blast) => (
+            <div
+              key={blast.id}
+              className="absolute"
+              style={{ left: blast.x, top: blast.y, color: blast.color }}
+            >
+              <BlastParticle onComplete={() => removeBlast(blast.id)} />
+            </div>
+        ))}
         <div
           ref={contentRef}
           style={parallaxStyle}
-          className="transition-transform duration-500 ease-out"
+          className="transition-transform duration-500 ease-out z-10"
           onClick={handleSurpriseClick}
         >
             {children}
@@ -110,6 +172,16 @@ export default function LandingPageClient({ children }: { children: ReactNode })
                 opacity: .85;
                 transform: scale(1.02);
             }
+        }
+        @keyframes blast {
+          from {
+            transform: scale(0) rotate(0deg);
+            opacity: 1;
+          }
+          to {
+            transform: scale(1.2) rotate(360deg);
+            opacity: 0;
+          }
         }
       `}</style>
     </main>
