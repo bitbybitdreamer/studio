@@ -2,11 +2,15 @@
 "use client";
 
 import { ReactNode, useState, useEffect, useRef, CSSProperties, MouseEvent } from "react";
+import { useRouter } from 'next/navigation';
+import { cn } from "@/lib/utils";
 
 export default function LandingPageClient({ children }: { children: ReactNode }) {
+  const router = useRouter();
   const contentRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [parallaxStyle, setParallaxStyle] = useState<CSSProperties>({});
+  const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 768);
@@ -35,9 +39,20 @@ export default function LandingPageClient({ children }: { children: ReactNode })
     });
   };
 
+  const handleSurpriseClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    setIsExiting(true);
+    setTimeout(() => {
+      router.push('/greeting');
+    }, 500); // Corresponds to the animation duration
+  };
+
   return (
     <main
-      className="flex min-h-screen flex-col items-center justify-center p-4 overflow-hidden relative"
+      className={cn(
+        "flex min-h-screen flex-col items-center justify-center p-4 overflow-hidden relative transition-opacity duration-500 ease-in-out",
+        isExiting ? "opacity-0" : "opacity-100"
+      )}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
@@ -45,6 +60,13 @@ export default function LandingPageClient({ children }: { children: ReactNode })
           ref={contentRef}
           style={parallaxStyle}
           className="transition-transform duration-500 ease-out"
+          onClick={(e) => {
+            const target = e.target as HTMLElement;
+            const link = target.closest('a');
+            if (link && link.href.endsWith('/greeting')) {
+                handleSurpriseClick(e as any);
+            }
+          }}
         >
             {children}
         </div>
