@@ -1,17 +1,17 @@
 
 "use client";
 
-import { useState, useEffect, useRef, CSSProperties, MouseEvent, ChangeEvent } from "react";
+import { useState, useEffect, useRef, CSSProperties, MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PartyPopper, Copy, Loader2, ArrowLeft, Upload, Wand2 } from "lucide-react";
+import { PartyPopper, Copy, Loader2, ArrowLeft, Wand2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import FireworksBackground from "./FireworksBackground";
 import { cn } from "@/lib/utils";
 import { generateWish } from "@/ai/flows/generate-wish";
-import { personalizeImage } from "@/ai/flows/personalize-image-flow";
+import { generateImageFromWish } from "@/ai/flows/generate-image-from-wish";
 
 
 type Blast = {
@@ -56,7 +56,6 @@ export default function GreetingPage({ wish }: { wish: string }) {
   const { toast } = useToast();
   const cardRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isMobile, setIsMobile] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
@@ -68,9 +67,8 @@ export default function GreetingPage({ wish }: { wish: string }) {
   const [currentWish, setCurrentWish] = useState(wish);
   const [isGenerating, setIsGenerating] = useState(false);
   
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const [personalizedImage, setPersonalizedImage] = useState<string | null>(null);
-  const [isPersonalizing, setIsPersonalizing] = useState(false);
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
 
   useEffect(() => {
@@ -128,7 +126,7 @@ export default function GreetingPage({ wish }: { wish: string }) {
       const result = await generateWish({ occasion: 'a happy occasion' });
       if (result.wish) {
         setCurrentWish(result.wish);
-        setPersonalizedImage(null); // Clear personalized image when wish changes
+        setGeneratedImage(null); // Clear generated image when wish changes
       }
     } catch (error) {
       console.error("Failed to generate new wish:", error);
@@ -170,47 +168,26 @@ export default function GreetingPage({ wish }: { wish: string }) {
     }, 500);
   };
   
-  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setUploadedImage(reader.result as string);
-        setPersonalizedImage(null); // Reset personalized image if a new one is uploaded
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handlePersonalizeImage = async () => {
-    if (!uploadedImage) {
-        toast({
-            variant: "destructive",
-            title: "No Image",
-            description: "Please upload an image first.",
-        });
-        return;
-    }
-
-    setIsPersonalizing(true);
+  const handleGenerateImage = async () => {
+    setIsGeneratingImage(true);
     try {
-        const result = await personalizeImage({ photoDataUri: uploadedImage, wish: currentWish });
+        const result = await generateImageFromWish({ wish: currentWish });
         if (result.imageDataUri) {
-            setPersonalizedImage(result.imageDataUri);
+            setGeneratedImage(result.imageDataUri);
             toast({
-                title: "Image Personalized!",
-                description: "Your photo has been updated with the wish.",
+                title: "Image Generated!",
+                description: "A beautiful image for your wish has been created.",
             });
         }
     } catch (error) {
-        console.error("Failed to personalize image:", error);
+        console.error("Failed to generate image:", error);
         toast({
             variant: "destructive",
-            title: "AI Personalization Failed",
-            description: "Could not add the wish to your image. Please try again.",
+            title: "AI Image Generation Failed",
+            description: "Could not create an image for your wish. Please try again.",
         });
     } finally {
-        setIsPersonalizing(false);
+        setIsGeneratingImage(false);
     }
   };
 
@@ -250,10 +227,8 @@ export default function GreetingPage({ wish }: { wish: string }) {
                 </h1>
                 
                 <div className="relative w-full aspect-square rounded-lg overflow-hidden border border-primary/20 flex items-center justify-center">
-                    {personalizedImage ? (
-                        <Image src={personalizedImage} alt="Personalized greeting" layout="fill" objectFit="contain" />
-                    ) : uploadedImage ? (
-                        <Image src={uploadedImage} alt="Uploaded preview" layout="fill" objectFit="contain" />
+                    {generatedImage ? (
+                        <Image src={generatedImage} alt="Generated greeting image" layout="fill" objectFit="contain" />
                     ) : (
                         <p className="font-body text-lg leading-relaxed text-foreground min-h-[112px] flex items-center justify-center p-4">
                             {currentWish}
@@ -283,22 +258,14 @@ export default function GreetingPage({ wish }: { wish: string }) {
                 </div>
                 
                 <div className="w-full border-t border-border pt-6 flex flex-col gap-4">
-                  <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageUpload} className="hidden" />
-                  <Button variant="secondary" onClick={() => fileInputRef.current?.click()} className="w-full">
-                    <Upload className="mr-2 h-4 w-4" />
-                    {uploadedImage ? "Change Photo?" : "Got a photo for the wish?"}
+                  <Button onClick={handleGenerateImage} disabled={isGeneratingImage} className="w-full bg-amber-500 hover:bg-amber-600 text-black">
+                    {isGeneratingImage ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Wand2 className="mr-2 h-4 w-4" />
+                    )}
+                    Generate Image from Wish
                   </Button>
-                  
-                  {uploadedImage && (
-                    <Button onClick={handlePersonalizeImage} disabled={isPersonalizing} className="w-full bg-amber-500 hover:bg-amber-600 text-black">
-                      {isPersonalizing ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        <Wand2 className="mr-2 h-4 w-4" />
-                      )}
-                      Personalize with AI
-                    </Button>
-                  )}
                 </div>
 
             </CardContent>
