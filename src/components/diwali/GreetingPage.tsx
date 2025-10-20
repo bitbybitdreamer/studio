@@ -112,7 +112,7 @@ export default function GreetingPage({ wish }: { wish: string }) {
 
     setIsGenerating(true);
     try {
-      const result = await generateWish({});
+      const result = await generateWish({ occasion: 'a happy occasion' });
       if (result.wish) {
         setCurrentWish(result.wish);
       }

@@ -5,6 +5,8 @@ import React, { ReactNode, useState, useEffect, useRef, CSSProperties, MouseEven
 import { useRouter } from 'next/navigation';
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { ArrowRight } from 'lucide-react';
+import FireworksBackground from "./FireworksBackground";
 
 type Blast = {
   id: number;
@@ -43,8 +45,7 @@ const BlastParticle = ({ onComplete }: { onComplete: () => void }) => {
   );
 };
 
-
-export default function LandingPageClient({ children }: { children: ReactNode }) {
+export default function LandingPageClient({ initialWish }: { initialWish: string }) {
   const router = useRouter();
   const contentRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
@@ -67,7 +68,7 @@ export default function LandingPageClient({ children }: { children: ReactNode })
     const xPos = (clientX / offsetWidth - 0.5) * 2;
     const yPos = (clientY / offsetHeight - 0.5) * 2;
 
-    const rotateY = xPos * 10; 
+    const rotateY = xPos * 10;
     const rotateX = yPos * -10;
 
     setParallaxStyle({
@@ -82,26 +83,25 @@ export default function LandingPageClient({ children }: { children: ReactNode })
   };
 
   const handleSurpriseClick = (e: MouseEvent<HTMLButtonElement>) => {
-      e.preventDefault();
-      
-      const newBlast: Blast = {
-        id: Date.now(),
-        x: e.clientX,
-        y: e.clientY,
-        color: COLORS[Math.floor(Math.random() * COLORS.length)],
-      };
-      setBlasts(prev => [...prev, newBlast]);
+    e.preventDefault();
 
-      setIsExiting(true);
-      setTimeout(() => {
-          router.push('/greeting');
-      }, 500); 
+    const newBlast: Blast = {
+      id: Date.now(),
+      x: e.clientX,
+      y: e.clientY,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+    };
+    setBlasts(prev => [...prev, newBlast]);
+
+    setIsExiting(true);
+    setTimeout(() => {
+      router.push('/greeting');
+    }, 500); // Animation duration
   };
 
   const removeBlast = (id: number) => {
     setBlasts(prev => prev.filter(b => b.id !== id));
   };
-
 
   return (
     <main
@@ -112,85 +112,66 @@ export default function LandingPageClient({ children }: { children: ReactNode })
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-        <div
-          ref={contentRef}
-          style={parallaxStyle}
-          className="transition-transform duration-500 ease-out relative z-10 flex flex-col items-center text-center"
-        >
-              {React.Children.map(children, child => {
-                if (React.isValidElement(child) && child.props.children) {
-                    const newChildren = React.Children.map(child.props.children, (grandchild: any) => {
-                         if (React.isValidElement(grandchild) && grandchild.type === Button) {
-                            return React.cloneElement(grandchild, { onClick: handleSurpriseClick });
-                         }
-                         return grandchild;
-                    });
-                    return React.cloneElement(child, {children: newChildren});
-                }
-                return child;
-              })}
-        </div>
-
-        {blasts.map((blast) => (
-            <div
-              key={blast.id}
-              className="absolute z-20"
-              style={{ left: blast.x, top: blast.y, color: blast.color, transform: 'translate(-50%, -50%)' }}
+      <FireworksBackground />
+      <div
+        ref={contentRef}
+        style={parallaxStyle}
+        className="transition-transform duration-500 ease-out z-10 flex flex-col items-center text-center"
+      >
+        <div className="z-10 flex flex-col items-center gap-6 text-center">
+            <h1 className="font-headline text-6xl md:text-8xl text-primary tracking-wider animate-fade-in-down">
+              Happy Diwali
+            </h1>
+            <p className="font-body text-lg md:text-xl leading-relaxed text-foreground max-w-2xl animate-fade-in-up">
+              {initialWish}
+            </p>
+            <Button
+              size="lg"
+              className="mt-6 bg-accent text-accent-foreground hover:bg-accent/90 animate-pulse"
+              onClick={handleSurpriseClick}
             >
-              <BlastParticle onComplete={() => removeBlast(blast.id)} />
-            </div>
-        ))}
+              Time for a Surprise!
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+        </div>
+      </div>
+
+      {blasts.map((blast) => (
+        <div
+          key={blast.id}
+          className="absolute z-20"
+          style={{ left: blast.x, top: blast.y, color: blast.color, transform: 'translate(-50%, -50%)' }}
+        >
+          <BlastParticle onComplete={() => removeBlast(blast.id)} />
+        </div>
+      ))}
       
       <style jsx>{`
-        @keyframes fade-in-down {
-          from {
-            opacity: 0;
-            transform: translateY(-20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        @keyframes fade-in-up {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
         .animate-fade-in-down {
           animation: fade-in-down 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        @keyframes fade-in-down {
+          from { opacity: 0; transform: translateY(-20px); }
+          to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in-up {
           animation: fade-in-up 1s 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
           opacity: 0;
         }
+        @keyframes fade-in-up {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
         .animate-pulse {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
         @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            50% {
-                opacity: .85;
-                transform: scale(1.02);
-            }
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: .85; transform: scale(1.02); }
         }
         @keyframes blast {
-          from {
-            transform: scale(0) rotate(0deg);
-            opacity: 1;
-          }
-          to {
-            transform: scale(1.2) rotate(360deg);
-            opacity: 0;
-          }
+          from { transform: scale(0) rotate(0deg); opacity: 1; }
+          to { transform: scale(1.2) rotate(360deg); opacity: 0; }
         }
       `}</style>
     </main>
