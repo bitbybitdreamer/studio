@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Loader2 } from 'lucide-react';
 import FireworksBackground from "./FireworksBackground";
-import { generateWish } from "@/ai/flows/generate-wish";
 
 type Blast = {
   id: number;
@@ -53,29 +52,12 @@ export default function LandingPageClient() {
   const [isExiting, setIsExiting] = useState(false);
   const [blasts, setBlasts] = useState<Blast[]>([]);
   const [wish, setWish] = useState("Wishing you a Diwali that shines as brightly as your spirit, bringing peace and happiness! 🪔");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setIsMobile(window.innerWidth < 768);
     }
-    
-    const fetchWish = async () => {
-      try {
-        const result = await generateWish({ occasion: 'Diwali' });
-        if (result.wish) {
-          setWish(result.wish);
-        }
-      } catch (error) {
-        console.error("Failed to generate wish for landing page:", error);
-        // A fallback wish is already set
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchWish();
-
   }, []);
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
@@ -114,7 +96,7 @@ export default function LandingPageClient() {
 
     setIsExiting(true);
     setTimeout(() => {
-      router.push('/greeting');
+      router.push(`/greeting?wish=${encodeURIComponent(wish)}`);
     }, 500); // Animation duration
   };
 
