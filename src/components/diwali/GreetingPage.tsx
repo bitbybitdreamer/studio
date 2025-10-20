@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef, CSSProperties, MouseEvent, ChangeEvent } from "react";
@@ -285,7 +286,7 @@ export default function GreetingPage({ wish }: { wish: string }) {
                   <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageUpload} className="hidden" />
                   <Button variant="secondary" onClick={() => fileInputRef.current?.click()} className="w-full">
                     <Upload className="mr-2 h-4 w-4" />
-                    {uploadedImage ? "Change Photo" : "Upload a Photo"}
+                    {uploadedImage ? "Change Photo?" : "Got a photo for the wish?"}
                   </Button>
                   
                   {uploadedImage && (
