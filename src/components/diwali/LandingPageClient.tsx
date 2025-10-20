@@ -52,7 +52,7 @@ export default function LandingPageClient() {
   const [parallaxStyle, setParallaxStyle] = useState<CSSProperties>({});
   const [blasts, setBlasts] = useState<Blast[]>([]);
   const [wish, setWish] = useState("Wishing you a Diwali that shines as brightly as your spirit, bringing peace and happiness! 🪔");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -60,7 +60,6 @@ export default function LandingPageClient() {
     }
     
     // Generate initial wish on the client-side to avoid blocking server render
-    setIsLoading(true);
     generateWish({ occasion: 'Diwali' })
       .then(result => {
         if (result.wish) {
