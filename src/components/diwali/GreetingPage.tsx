@@ -95,11 +95,11 @@ export default function GreetingPage({ initialWish }: { initialWish: string }) {
   const handleMouseLeave = () => {
     setParallaxStyle({
       transform: `perspective(1200px) rotateX(0deg) rotateY(0deg)`,
-      transition: 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)',
+      transition: 'transform 0.5s cubic-bezier(0.19, 1, 0.22, 1)',
     });
     setBackgroundParallaxStyle({
       transform: `translateX(0px) translateY(0px)`,
-      transition: 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)',
+      transition: 'transform 0.5s cubic-bezier(0.19, 1, 0.22, 1)',
     });
   };
 
@@ -152,7 +152,7 @@ export default function GreetingPage({ initialWish }: { initialWish: string }) {
     });
   };
 
-  const handleShare = (platform: 'whatsapp' | 'twitter' | 'facebook') => {
+  const handleShare = (platform: 'whatsapp' | 'twitter' | 'facebook' | 'instagram') => {
     const text = encodeURIComponent(currentWish);
     const appUrl = encodeURIComponent('https://your-app-url.com'); // Replace with your actual app URL
     let shareUrl = '';
@@ -160,16 +160,32 @@ export default function GreetingPage({ initialWish }: { initialWish: string }) {
     switch (platform) {
       case 'whatsapp':
         shareUrl = `https://api.whatsapp.com/send?text=${text}`;
+        window.open(shareUrl, '_blank', 'noopener,noreferrer');
         break;
       case 'twitter':
         shareUrl = `https://twitter.com/intent/tweet?text=${text}`;
+        window.open(shareUrl, '_blank', 'noopener,noreferrer');
         break;
       case 'facebook':
-        // Facebook sharer works best with a URL. We use the quote parameter for the text.
         shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${appUrl}&quote=${text}`;
+        window.open(shareUrl, '_blank', 'noopener,noreferrer');
+        break;
+      case 'instagram':
+        if (navigator.share) {
+            navigator.share({
+                title: 'Diwali Wish',
+                text: currentWish,
+            })
+            .catch((error) => console.error('Error sharing:', error));
+        } else {
+            handleCopyWish();
+            toast({
+                title: "Wish Copied!",
+                description: "You can now paste it into Instagram.",
+            });
+        }
         break;
     }
-    window.open(shareUrl, '_blank', 'noopener,noreferrer');
   };
 
   const handleBackClick = () => {
@@ -181,6 +197,15 @@ export default function GreetingPage({ initialWish }: { initialWish: string }) {
       <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.487 5.235 3.487 8.413 0 6.557-5.338 11.892-11.894 11.892-1.99 0-3.875-.546-5.597-1.528L.057 24zM12.002 2.169c-5.42 0-9.817 4.396-9.817 9.817 0 1.839.505 3.593 1.418 5.099L2.04 21.96l5.204-1.358a9.757 9.757 0 0 0 4.758 1.251h.001c5.42 0 9.818-4.397 9.818-9.818 0-5.42-4.398-9.817-9.818-9.817zm4.832 7.54c-.27-.135-1.596-.786-1.844-.876-.248-.09-.43-.135-.612.135-.182.27-.696.876-.854 1.056-.158.18-.316.202-.594.067-.278-.135-1.173-.434-2.234-1.378-.827-.736-1.38-1.649-1.538-1.928-.158-.279-.016-.43.118-.564.12-.12.27-.315.404-.42.135-.105.18-.18.27-.315.09-.135.045-.248-.023-.344-.067-.09-.612-1.476-.838-2.022-.225-.546-.45-.47-.612-.478-.158-.01-.344-.01-.53-.01s-.473.068-.72.344c-.248.276-.94.91-1.166 2.206-.226 1.296.248 2.548.27 2.728.02.18.575 1.232 1.39 1.83.93.705 1.636.93 2.205 1.155.88.345 1.396.315 1.844.225.51-.104 1.597-.65 1.82-1.274.224-.624.224-1.155.158-1.274-.067-.12-.182-.18-.344-.27z"/>
     </svg>
   );
+
+  const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+    </svg>
+  );
+
 
   return (
     <main
@@ -249,6 +274,9 @@ export default function GreetingPage({ initialWish }: { initialWish: string }) {
                         <Button variant="ghost" size="icon" className="rounded-full h-12 w-12 bg-secondary/50 hover:bg-secondary" onClick={() => handleShare('facebook')}>
                             <Facebook className="w-6 h-6 text-[#1877F2]" />
                         </Button>
+                        <Button variant="ghost" size="icon" className="rounded-full h-12 w-12 bg-secondary/50 hover:bg-secondary" onClick={() => handleShare('instagram')}>
+                           <InstagramIcon className="w-6 h-6" style={{ background: 'radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%)', borderRadius: '6px', color: 'white', stroke: 'none', padding: '2px' }} />
+                        </Button>
                     </div>
                 </div>
 
@@ -275,3 +303,4 @@ export default function GreetingPage({ initialWish }: { initialWish: string }) {
     </main>
   );
 }
+
